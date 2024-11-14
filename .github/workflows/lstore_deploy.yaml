@@ -13,14 +13,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2  # دریافت کد پروژه
 
-      - name: Test SSH Connection
-        run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
-
-
-      - name: Test SSH connection
-        run: |
-              ssh -v -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
-
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -31,5 +23,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
+          ssh -v -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
           rsync -az --exclude='.git' --exclude='node_modules' . matin@192.168.1.105:/var/www/store/public_html
