@@ -13,6 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2  # دریافت کد پروژه
 
+      - name: Test SSH connection
+        run: |
+              ssh -v -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -25,5 +28,4 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
-          ssh -v -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
           rsync -az --exclude='.git' --exclude='node_modules' . matin@192.168.1.105:/var/www/store/public_html
