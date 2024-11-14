@@ -20,10 +20,14 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
+          # ساخت دایرکتوری .ssh
           mkdir -p ~/.ssh
+          # ذخیره کلید خصوصی از GitHub Secrets در فایل id_rsa
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
-          ssh -v -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
+          # اضافه کردن شناسه میزبان سرور به known_hosts برای جلوگیری از هشدارها
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
+          # تست اتصال SSH به سرور
+          ssh -v -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
+          # انتقال فایل‌ها با rsync
           rsync -az --exclude='.git' --exclude='node_modules' . matin@192.168.1.105:/var/www/store/public_html
