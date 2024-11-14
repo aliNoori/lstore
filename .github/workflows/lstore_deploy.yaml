@@ -27,7 +27,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           # اضافه کردن شناسه میزبان سرور به known_hosts برای جلوگیری از هشدارها
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
-          # تست اتصال SSH به سرور
-          ssh -v -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
+          # اتصال به سرور برای تست SSH و دریافت خروجی بیشتر
+          ssh -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
           # انتقال فایل‌ها با rsync
           rsync -az --exclude='.git' --exclude='node_modules' . matin@192.168.1.105:/var/www/store/public_html
