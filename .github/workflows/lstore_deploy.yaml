@@ -43,6 +43,11 @@ jobs:
           fi
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
-          # اضافه کردن -v برای نمایش خروجی بیشتر
-          ssh -vvv -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
+
+          # ثبت خروجی در فایل log
+          ssh -vvv -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'" | tee ssh_output.log
+
+          # نمایش محتوای لاگ
+          cat ssh_output.log
+
 
