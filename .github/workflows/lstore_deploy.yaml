@@ -13,6 +13,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2  # دریافت کد پروژه
 
+      - name: Check SSH_PRIVATE_KEY
+        run: echo "$SSH_PRIVATE_KEY"
+
+
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
