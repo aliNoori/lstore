@@ -1,0 +1,27 @@
+name: LStore Deploy
+
+on:
+  push:
+    branches:
+      - master  # دیپلوی روی تغییرات در برنچ مستر
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2  # دریافت کد پروژه
+
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Deploy to server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
+          rsync -az --exclude='.git' --exclude='node_modules' . root@192.168.1.105:/var/www/store/public_html
