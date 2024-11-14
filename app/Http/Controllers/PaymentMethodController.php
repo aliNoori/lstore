@@ -17,7 +17,7 @@ class PaymentMethodController extends Controller
     /**
      * Display a listing of the resource.
      */
-    //TODO:test git and deploy to server
+
 
 
     public function list(): JsonResponse
