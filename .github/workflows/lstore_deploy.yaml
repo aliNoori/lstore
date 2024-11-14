@@ -24,4 +24,4 @@ jobs:
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
-          rsync -az --exclude='.git' --exclude='node_modules' . matin@192.168.1.105:/var/www/store/public_html
+          rsync -az --exclude='.git' --exclude='node_modules' /var/www/store/public_html/ matin@192.168.1.105:/var/www/store/public_html
