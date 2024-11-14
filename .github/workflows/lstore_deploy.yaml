@@ -37,6 +37,13 @@ jobs:
           mkdir -p ~/.ssh
           # ذخیره کلید خصوصی از GitHub Secrets در فایل id_rsa
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          # چک کردن وجود فایل id_rsa
+          if [ -f ~/.ssh/id_rsa ]; then
+            echo "id_rsa file created successfully."
+          else
+            echo "Failed to create id_rsa file."
+            exit 1
+          fi
           chmod 600 ~/.ssh/id_rsa
           # اضافه کردن شناسه میزبان سرور به known_hosts برای جلوگیری از هشدارها
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
