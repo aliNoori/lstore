@@ -15,7 +15,7 @@ jobs:
 
       - name: Test SSH connection
         run: |
-              ssh -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
+              ssh -i ~/matin/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'"
 
       - name: Install Composer dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
