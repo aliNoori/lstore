@@ -13,8 +13,14 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2  # دریافت کد پروژه
 
-      - name: Check SSH_PRIVATE_KEY
-        run: echo "$SSH_PRIVATE_KEY"
+      - name: Check if SSH_PRIVATE_KEY is set
+        run: |
+          if [ -z "$SSH_PRIVATE_KEY" ]; then
+            echo "SSH_PRIVATE_KEY is not set"
+          else
+            echo "SSH_PRIVATE_KEY is set"
+          fi
+
 
 
       - name: Install Composer dependencies
