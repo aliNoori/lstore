@@ -42,12 +42,23 @@ jobs:
             exit 1
           fi
           chmod 600 ~/.ssh/id_rsa
+
+          # نمایش محتویات دایرکتوری .ssh برای بررسی فایل‌ها
+          echo "Contents of ~/.ssh directory:"
+          ls -la ~/.ssh
+
+          # نمایش شناسه میزبان سرور (برای بررسی مشکلات مربوط به known_hosts)
+          echo "Contents of known_hosts:"
+          cat ~/.ssh/known_hosts
+
+          # اضافه کردن شناسه میزبان سرور به known_hosts برای جلوگیری از هشدارها
           ssh-keyscan -H "192.168.1.105" >> ~/.ssh/known_hosts
 
-          # ثبت خروجی در فایل log
+          # ثبت خروجی SSH در فایل لاگ و نمایش آن
           ssh -vvv -i ~/.ssh/id_rsa matin@192.168.1.105 "echo 'SSH connection successful'" | tee ssh_output.log
 
           # نمایش محتوای لاگ
           cat ssh_output.log
+
 
 
