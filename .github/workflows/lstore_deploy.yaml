@@ -1,61 +1,24 @@
-name: LStore Deploy
+name: SSH Connection Test
 
 on:
   push:
     branches:
-      - master  # دیپلوی روی تغییرات در برنچ مستر
+      - master
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # دریافت کد پروژه
+        uses: actions/checkout@v3
 
-      - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Deploy to server
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Set up SSH
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          if [ -f ~/.ssh/id_rsa ]; then
-            echo "id_rsa file created successfully."
-          else
-            echo "Failed to create id_rsa file."
-            exit 1
-          fi
           chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H 151.245.160.148 >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
-          # بررسی فایل‌ها و نمایش محتویات
-          echo "Contents of ~/.ssh directory:"
-          ls -l ~/.ssh
-
-          # بررسی وجود فایل known_hosts
-          if [ ! -f ~/.ssh/known_hosts ]; then
-            echo "known_hosts file does not exist, creating it."
-            touch ~/.ssh/known_hosts
-          fi
-
-          # اضافه کردن شناسه میزبان سرور به known_hosts و نمایش خروجی
-          echo "Adding server's host key to known_hosts:"
-          ssh-keyscan -vvv -H "151.245.160.148" >> ~/.ssh/known_hosts
-
-          # نمایش محتویات فایل known_hosts
-          echo "Contents of known_hosts:"
-          cat ~/.ssh/known_hosts
-
-          # ثبت خروجی SSH در فایل لاگ
-          echo "Attempting SSH connection to server..."
-          ssh -vvv -i ~/.ssh/id_rsa matin@151.245.160.148 "echo 'SSH connection successful'" | tee ssh_output.log
-
-          # نمایش محتوای لاگ
-          cat ssh_output.log
-
-
-
-
-
+      - name: Test SSH connection
+        run: ssh -i ~/.ssh/id_rsa matin@151.245.160.148 "echo 'SSH connection successful'"
