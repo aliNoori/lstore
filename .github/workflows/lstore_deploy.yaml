@@ -18,12 +18,12 @@ jobs:
 
       - name: Deploy to local server
         run: |
-          cp -R . /var/www/store/public_html
+          cp -R . /var/www/store/public_html/lstore
           chmod -R 775 /var/www/store/public_html/storage /var/www/store/public_html/bootstrap/cache
 
       - name: Run migrations
         run: |
-          #cd /var/www/store/public_html
+          #cd /var/www/store/public_html/lstore
           #php artisan migrate --force
           #php artisan db:seed --force
 
