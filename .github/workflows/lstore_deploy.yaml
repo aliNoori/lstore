@@ -12,5 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+
       - name: Test SSH connection
         run: ssh -i ~/.ssh/id_rsa matin@151.245.160.148 "echo 'SSH connection successful'"
