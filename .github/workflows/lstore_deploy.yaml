@@ -19,7 +19,7 @@ jobs:
       - name: Deploy to local server
         run: |
           cp -R . /var/www/store/public_html/lstore
-          chmod -R 775 /var/www/store/public_html/storage /var/www/store/public_html/bootstrap/cache
+          chmod -R 775 /var/www/store/public_html/lstore/storage /var/www/store/public_html/lstore/bootstrap/cache
 
       - name: Run migrations
         run: |
