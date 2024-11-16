@@ -56,7 +56,7 @@ jobs:
 
           # اضافه کردن شناسه میزبان سرور به known_hosts و نمایش خروجی
           echo "Adding server's host key to known_hosts:"
-          ssh-keyscan -vvv -H "151.245.160.207" >> ~/.ssh/known_hosts
+          ssh-keyscan -vvv -H "188.211.204.199" >> ~/.ssh/known_hosts
 
           # نمایش محتویات فایل known_hosts
           echo "Contents of known_hosts:"
@@ -64,7 +64,7 @@ jobs:
 
           # ثبت خروجی SSH در فایل لاگ
           echo "Attempting SSH connection to server..."
-          ssh -vvv -i ~/.ssh/id_rsa matin@151.245.160.207 "echo 'SSH connection successful'" | tee ssh_output.log
+          ssh -vvv -i ~/.ssh/id_rsa matin@188.211.204.199 "echo 'SSH connection successful'" | tee ssh_output.log
 
           # نمایش محتوای لاگ
           cat ssh_output.log
