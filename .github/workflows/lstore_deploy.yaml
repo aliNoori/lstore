@@ -1,23 +1,36 @@
-name: SSH Connection Test
+name: LStore Deploy
 
 on:
   push:
     branches:
-      - master
+      - master  # دیپلوی روی تغییرات در برنچ مستر
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted  # Self-hosted Runner
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2  # دریافت کد پروژه
 
-      - name: Set up SSH
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Deploy to local server
         run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          cp -R . /var/www/store/public_html
+          chmod -R 775 /var/www/store/public_html/storage /var/www/store/public_html/bootstrap/cache
 
-      - name: Test SSH connection
-        run: ssh -i ~/.ssh/id_rsa matin@151.245.160.148 "echo 'SSH connection successful'"
+      - name: Run migrations
+        run: |
+          #cd /var/www/store/public_html
+          #php artisan migrate --force
+          #php artisan db:seed --force
+
+      - name: Cache configuration
+        run: |
+          cd /var/www/store/public_html/lstore
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+
