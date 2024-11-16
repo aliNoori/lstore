@@ -12,13 +12,5 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H 151.245.160.148 >> ~/.ssh/known_hosts
-          chmod 600 ~/.ssh/known_hosts
-
       - name: Test SSH connection
         run: ssh -i ~/.ssh/id_rsa matin@151.245.160.148 "echo 'SSH connection successful'"
