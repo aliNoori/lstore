@@ -12,23 +12,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
       - name: Deploy to local server
         run: |
-          rsync -av --exclude='.git' --exclude='node_modules' --exclude='storage/logs' ./ /var/www/store/public_html/lstore
-          chmod -R 750 /var/www/store/public_html/lstore
-          chmod -R 770 /var/www/store/public_html/lstore/storage /var/www/store/public_html/lstore/bootstrap/cache
-          chown -R www-data:www-data /var/www/store/public_html/lstore
-
+          sudo rsync -av --exclude='.git' --exclude='node_modules' --exclude='storage/logs' ./ /var/www/store/public_html/lstore
+          sudo chmod -R 750 /var/www/store/public_html/lstore
+          sudo chmod -R 770 /var/www/store/public_html/lstore/storage /var/www/store/public_html/lstore/bootstrap/cache
+          sudo chown -R www-data:www-data /var/www/store/public_html/lstore
       - name: Run migrations
         run: |
           cd /var/www/store/public_html/lstore
           php artisan migrate --force
           php artisan db:seed --force
-
       - name: Cache configuration
         run: |
           cd /var/www/store/public_html/lstore
