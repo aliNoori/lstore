@@ -3,30 +3,31 @@ name: LStore Deploy
 on:
   push:
     branches:
-      - master  # دیپلوی روی تغییرات در برنچ مستر
+      - master
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Self-hosted Runner
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2  # دریافت کد پروژه
+        uses: actions/checkout@v2
 
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
       - name: Deploy to local server
         run: |
-          cp -R . /var/www/store/public_html/lstore
-          chmod -R 775 /var/www/store/public_html/lstore/storage /var/www/store/public_html/lstore/bootstrap/cache
-          #php artisan storage:link
+          rsync -av --exclude='.git' --exclude='node_modules' --exclude='storage/logs' ./ /var/www/store/public_html/lstore
+          chmod -R 750 /var/www/store/public_html/lstore
+          chmod -R 770 /var/www/store/public_html/lstore/storage /var/www/store/public_html/lstore/bootstrap/cache
+          chown -R www-data:www-data /var/www/store/public_html/lstore
 
       - name: Run migrations
         run: |
-          #cd /var/www/store/public_html/lstore
-          #php artisan migrate --force
-          #php artisan db:seed --force
+          cd /var/www/store/public_html/lstore
+          php artisan migrate --force
+          php artisan db:seed --force
 
       - name: Cache configuration
         run: |
@@ -35,3 +36,5 @@ jobs:
           php artisan route:cache
           php artisan view:cache
 
+      - name: Check application health
+        run: curl -f http://188.211.206.115/health-check
