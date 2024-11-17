@@ -20,6 +20,7 @@ jobs:
         run: |
           cp -R . /var/www/store/public_html/lstore
           chmod -R 775 /var/www/store/public_html/lstore/storage /var/www/store/public_html/lstore/bootstrap/cache
+          #php artisan storage:link
 
       - name: Run migrations
         run: |
