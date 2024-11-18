@@ -63,6 +63,8 @@ class UserController extends Controller
 
         $user->addImage($request,$user);
 
+        $user->assignRole('admin');
+
         ///token created for user
         $token = $user->createToken('authToken', ['read', 'write'])->plainTextToken;
 
