@@ -89,6 +89,10 @@ class User extends Authenticatable
     {
         return $this->scores()->sum('score'); // محاسبه امتیازات
     }
+    public function getRolesAttribute(): \Illuminate\Support\Collection
+    {
+        return $this->getRoleNames(); // Returns a collection
+    }
     public function getCouponsCountAttribute(): int
     {
         return $this->coupons()->count(); // محاسبه امتیازات
