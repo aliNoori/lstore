@@ -49,7 +49,7 @@ class PermissionRoleController extends Controller
     {
         //
         //$user=$request->user();
-        $user=User::where('email',$email)->get();
+        $user=User::where('email',$email)->first();
         $user->removeRole($request->role);
 
         return response()->json([
