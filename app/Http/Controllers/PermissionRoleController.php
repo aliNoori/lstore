@@ -45,14 +45,15 @@ class PermissionRoleController extends Controller
      * @param PermissionRoleRequest $request
      * @return JsonResponse
      */
-    public function removeRoles(PermissionRoleRequest $request,$user_id): JsonResponse
+    public function removeRoles(PermissionRoleRequest $request,$email): JsonResponse
     {
         //
         //$user=$request->user();
-        $user=User::find($user_id);
+        $user=User::where('email',$email)->get();
         $user->removeRole($request->role);
 
         return response()->json([
+            'success'=>true,
             'message'=>$user->name.'  remove role  '.$request->role,
         ]);
     }
