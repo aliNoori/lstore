@@ -25,7 +25,7 @@ class UserResource extends JsonResource
             'items_cart'=>$this->items_cart,
             'wallet_balance'=>$this->wallet_balance,
             'score' =>$this->scores,
-            'roles'=>$this->roles
+            'roles'=>$this->user_roles
         ];
     }
 }

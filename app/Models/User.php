@@ -89,7 +89,7 @@ class User extends Authenticatable
     {
         return $this->scores()->sum('score'); // محاسبه امتیازات
     }
-    public function getRolesAttribute(): \Illuminate\Support\Collection
+    public function getUserRolesAttribute(): \Illuminate\Support\Collection
     {
         return $this->getRoleNames(); // Returns a collection
     }
