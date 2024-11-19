@@ -34,15 +34,19 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return AnonymousResourceCollection
+     * @return JsonResponse
      */
-    public function usersList(): AnonymousResourceCollection
+    public function usersList(): JsonResponse
     {
         //
         //TODO:register role admin
         $users=User::all();
         // بازگشت مجموعه‌ای از منابع
-        return UserResource::collection($users);
+        return response()->json([
+            'users_list'=>UserResource::collection($users),
+            //'token'=>$token,
+        ]);
+        //return UserResource::collection($users);
     }
 
     /**
