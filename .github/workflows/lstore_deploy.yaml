@@ -33,4 +33,4 @@ jobs:
           php artisan view:cache
 
       - name: Check application health
-        run: curl -f http://151.247.176.218/health-check
+        run: curl -f http://188.211.204.175/health-check
