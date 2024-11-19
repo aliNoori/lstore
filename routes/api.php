@@ -42,7 +42,7 @@ Route::group(['prefix' => 'user'], function () {
 
         });
 
-        Route::get('/users', [UserController::class, 'index']);
+        Route::get('/users/list', [UserController::class, 'usersList']);
         Route::get('/show/{id}', [UserController::class, 'show']);
         Route::post('/update/{id}', [UserController::class, 'update']);
         Route::delete('/delete/{id}', [UserController::class, 'delete']);

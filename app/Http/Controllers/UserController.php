@@ -12,7 +12,9 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\WalletResource;
 use App\Models\File;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -32,9 +34,9 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
-    public function index()
+    public function usersList(): AnonymousResourceCollection
     {
         //
         //TODO:register role admin
@@ -46,9 +48,10 @@ class UserController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @param UserRequest $request
+     * @return JsonResponse
      */
-    public function create(UserRequest $request): \Illuminate\Http\JsonResponse
+    public function create(UserRequest $request): JsonResponse
     {
         //
         // دریافت داده‌های معتبر
@@ -89,7 +92,7 @@ class UserController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
@@ -118,7 +121,7 @@ class UserController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function update(UserRequest $request, $id)
     {
@@ -151,7 +154,7 @@ class UserController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function delete(Request $request,$id)
     {
@@ -164,7 +167,7 @@ class UserController extends Controller
             'message'=>$user->name.'deleted',
         ]);
     }
-    public function addAddress(AddressRequest $request): \Illuminate\Http\JsonResponse
+    public function addAddress(AddressRequest $request): JsonResponse
     {
         // پیدا کردن کاربر
         $user = $request->user();
@@ -183,7 +186,7 @@ class UserController extends Controller
             'address' => new AddressResource($address)
         ], 201);
     }
-    public function editAddress(AddressRequest $request, $addressId): \Illuminate\Http\JsonResponse
+    public function editAddress(AddressRequest $request, $addressId): JsonResponse
     {
         // پیدا کردن کاربر
         $user = $request->user();
@@ -213,7 +216,7 @@ class UserController extends Controller
         ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
     }
 
-    public function addresses(Request $request): \Illuminate\Http\JsonResponse
+    public function addresses(Request $request): JsonResponse
     {
         // پیدا کردن کاربر
         $user = $request->user();
@@ -229,7 +232,7 @@ class UserController extends Controller
             'addresses' => AddressResource::collection($addresses)
         ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
     }
-    public function myWallet(Request $request): \Illuminate\Http\JsonResponse
+    public function myWallet(Request $request): JsonResponse
     {
         // پیدا کردن کاربر
         $user = $request->user();
@@ -245,7 +248,7 @@ class UserController extends Controller
             'wallet' => new WalletResource($wallet)
         ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
     }
-    public function myScores(Request $request): \Illuminate\Http\JsonResponse
+    public function myScores(Request $request): JsonResponse
     {
         // پیدا کردن کاربر
         $user = $request->user();
@@ -261,7 +264,7 @@ class UserController extends Controller
             'scores' => ScoreResource::collection($scores)
         ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
     }
-    public function myCoupons(Request $request): \Illuminate\Http\JsonResponse
+    public function myCoupons(Request $request): JsonResponse
     {
         // پیدا کردن کاربر
         $user = $request->user();
@@ -277,7 +280,7 @@ class UserController extends Controller
             'coupons' => CouponResource::collection($coupons)
         ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
     }
-    public function myOrders(Request $request): \Illuminate\Http\JsonResponse
+    public function myOrders(Request $request): JsonResponse
     {
         // پیدا کردن کاربر
         $user = $request->user();
