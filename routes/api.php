@@ -214,7 +214,7 @@ Route::group(['prefix' => 'permissionRoleSetting'], function () {
         Route::post('/givePermissions/{user_id}', [PermissionRoleController::class, 'givePermissions']);
         Route::post('/revokePermissions/{user_id}', [PermissionRoleController::class, 'revokePermissions']);
         Route::post('/assignRoles/{user_id}', [PermissionRoleController::class, 'assignRoles']);
-        Route::post('/removeRoles/{user_id}', [PermissionRoleController::class, 'removeRoles']);
+        Route::post('/removeRoles/{email}', [PermissionRoleController::class, 'removeRoles']);
 
     });
 });
