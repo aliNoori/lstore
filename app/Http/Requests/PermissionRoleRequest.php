@@ -23,16 +23,42 @@ class PermissionRoleRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            //'role_id' => 'nullable|required_without:permissions|integer|exists:roles,id',
-            'role' => 'required_without:permission|string|exists:roles,name|prohibited_with:permission',
-            'permission' => 'required_without:role|string|exists:permissions,name|prohibited_with:role',
-            //'permissions' => 'nullable|required_without:role_id|array',
-            //'permissions.*' => 'integer|exists:permissions,id',
+            'role' => [
+                'required_without:permission',
+                'string',
+                'exists:roles,name',
+                function ($attribute, $value, $fail) {
+                    if ($this->filled('permission')) {
+                        $fail("The $attribute is prohibited when permission is present.");
+                    }
+                },
+            ],
+            'permission' => [
+                'required_without:role',
+                'string',
+                'exists:permissions,name',
+                function ($attribute, $value, $fail) {
+                    if ($this->filled('role')) {
+                        $fail("The $attribute is prohibited when role is present.");
+                    }
+                },
+            ],
         ];
     }
+
+    /* public function rules()
+     {
+         return [
+             //'role_id' => 'nullable|required_without:permissions|integer|exists:roles,id',
+             'role' => 'required_without:permission|string|exists:roles,name|prohibited_with:permission',
+             'permission' => 'required_without:role|string|exists:permissions,name|prohibited_with:role',
+             //'permissions' => 'nullable|required_without:role_id|array',
+             //'permissions.*' => 'integer|exists:permissions,id',
+         ];
+     }*/
 
     // متد سفارشی برای مدیریت خطاهای اعتبارسنجی
     protected function failedValidation(Validator $validator)
