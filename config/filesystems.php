@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'local'),
+    'default' => env('FILESYSTEM_DISK', 'ftp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,6 +42,23 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
+        ],
+        'ftp' => [
+
+            'driver' => env('STORE_FILE_SERVER_DRIVER'),
+
+            'host' => env('STORE_FILE_SERVER_HOST'),
+
+            'username' => env('STORE_FILE_SERVER_USERNAME'),
+
+            'password' => env('STORE_FILE_SERVER_PASSWORD'),
+
+            'root' => env('STORE_FILE_SERVER_ROOT'),
+            // 'passive'  => true,
+            // 'ssl'      => true,
+            // 'timeout'  => 30,
+            // 'port'     => 21,
+            // Optional FTP Settings...
         ],
 
         's3' => [
