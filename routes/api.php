@@ -211,10 +211,8 @@ Route::group(['prefix' => 'permissionRoleSetting'], function () {
 
     Route::middleware(['auth:sanctum'/*, 'has.permission', 'has.role'*/])->group(function () {
 
-        Route::post('/givePermissions/{user_id}', [PermissionRoleController::class, 'givePermissions']);
-        Route::post('/revokePermissions/{user_id}', [PermissionRoleController::class, 'revokePermissions']);
-        Route::post('/assignRoles/{user_id}', [PermissionRoleController::class, 'assignRoles']);
-        Route::post('/removeRoles/{email}', [PermissionRoleController::class, 'removeRoles']);
+        Route::post('/togglePermissions/{email}', [PermissionRoleController::class, 'togglePermissions']);
+        Route::post('/toggleRoles/{email}', [PermissionRoleController::class, 'toggleRoles']);
 
     });
 });
