@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 trait ImageManager
 {
@@ -22,12 +23,18 @@ trait ImageManager
 
 
             // ذخیره فایل در پوشه uploads/images
-            $filePath = $fileData->storeAs('uploads/images', $newFileName, 'public');
+            //$filePath = $fileData->storeAs('uploads/images', $newFileName, 'public');
+            // ذخیره فایل در FTP
+            $filePath = 'uploads/images/' . $newFileName;
+            $disk = 'ftp'; // دیسک مورد استفاده (باید در config/filesystems.php تعریف شود)
+            Storage::disk($disk)->putFileAs('uploads/images', $fileData, $newFileName);
+
 
 
             $file = new File([
                 'file_name' => $newFileName,
-                'file_path' => '/storage/' . $filePath,
+                //'file_path' => '/storage/' . $filePath,
+                'file_path' => $filePath,
                 'file_type' => $fileData->getMimeType(),
                 'file_size' => $fileData->getSize(),
             ]);
@@ -39,15 +46,24 @@ trait ImageManager
     {
         if ($request->hasFile('image')) {
         if ($model->image) {
-            // حذف فایل از سیستم
+
+            $disk = 'ftp'; // دیسک FTP
+            // حذف فایل از FTP
+            if (Storage::disk($disk)->exists($model->image->file_path)) {
+                Storage::disk($disk)->delete($model->image->file_path);
+            }
+           /* // حذف فایل از سیستم
             if (file_exists(public_path( $model->image->file_path))) {
                 unlink(public_path( $model->image->file_path));
-            }
+            }*/
             // حذف رکورد فایل از دیتابیس
             $model->image->delete();
-        }}
+        }
+        }
     }
+
     /**
+     * @param Request $request
      * @param $model
      * @return void
      */
@@ -58,10 +74,16 @@ trait ImageManager
         if ($request->hasFile('image')) {
 
             if ($model->image) {
-                // حذف فایل از سیستم
+
+                $disk = 'ftp'; // دیسک FTP
+                // حذف فایل از FTP
+                if (Storage::disk($disk)->exists($model->image->file_path)) {
+                    Storage::disk($disk)->delete($model->image->file_path);
+                }
+               /* // حذف فایل از سیستم
                 if (file_exists(public_path( $model->image->file_path))) {
                     unlink(public_path( $model->image->file_path));
-                }
+                }*/
                 // حذف رکورد فایل از دیتابیس
                 $model->image->delete();
 
