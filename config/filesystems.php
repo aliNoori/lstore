@@ -54,6 +54,8 @@ return [
             'password' => env('STORE_FILE_SERVER_PASSWORD'),
 
             'root' => env('STORE_FILE_SERVER_ROOT'),
+
+            'url' => 'http://192.168.1.105/uploads/images', // آدرس وب سرور
             // 'passive'  => true,
             // 'ssl'      => true,
             // 'timeout'  => 30,
