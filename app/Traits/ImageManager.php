@@ -25,7 +25,7 @@ trait ImageManager
             // ذخیره فایل در پوشه uploads/images
             //$filePath = $fileData->storeAs('uploads/images', $newFileName, 'public');
             // ذخیره فایل در FTP
-            $filePath = 'uploads/images/' . $newFileName;
+            $filePath = '/uploads/images/' . $newFileName;
             $disk = 'ftp'; // دیسک مورد استفاده (باید در config/filesystems.php تعریف شود)
             Storage::disk($disk)->putFileAs('uploads/images', $fileData, $newFileName);
 
