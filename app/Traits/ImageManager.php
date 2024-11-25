@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Models\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 trait ImageManager
@@ -48,6 +49,8 @@ trait ImageManager
         if ($model->image) {
 
             $disk = 'ftp'; // دیسک FTP
+            Log::info($model->image->file_path, [Storage::disk('ftp')->path($model->image->file_path)]);
+
             // حذف فایل از FTP
             if (Storage::disk($disk)->exists($model->image->file_path)) {
                 Storage::disk($disk)->delete($model->image->file_path);
