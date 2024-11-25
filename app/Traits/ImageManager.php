@@ -30,7 +30,7 @@ trait ImageManager
             $disk = 'ftp'; // دیسک مورد استفاده (باید در config/filesystems.php تعریف شود)
             $result=Storage::disk($disk)->putFileAs('uploads/images', $fileData, $newFileName);
 
-            Log::info($result,['test']);
+            Log::info('File upload result:', ['path' => $result]);
 
 
 
