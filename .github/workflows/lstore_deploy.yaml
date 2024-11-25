@@ -31,6 +31,10 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-
+      - name: Enable site
+        run: |
+           sudo a2dissite store.python.local.conf
+           sudo a2ensite store.laravel.local.conf
+           sudo systemctl restart apache2
       - name: Check application health
-        run: curl -f http://188.211.204.175/health-check
+        run: curl -f http://89.37.244.54/health-check
