@@ -73,28 +73,35 @@ trait ImageManager
      */
     public function updatedImageIfExist(Request $request, $model): void
     {
-
-
         if ($request->hasFile('image')) {
-
             if ($model->image) {
-
                 $disk = 'ftp'; // دیسک FTP
-                Log::info('test');
-                Log::info('$model->image->file_path', [Storage::disk('ftp')->path($model->image->file_path)]);
-                // حذف فایل از FTP
-                if (Storage::disk($disk)->exists($model->image->file_path)) {
-                    Storage::disk($disk)->delete($model->image->file_path);
+                $filePath = $model->image->file_path;
+
+                // لاگ مسیر فایل
+                Log::info('Attempting to delete file from FTP', ['file_path' => $filePath]);
+
+                try {
+                    // بررسی وجود فایل و حذف آن
+                    if (Storage::disk($disk)->exists($filePath)) {
+                        Storage::disk($disk)->delete($filePath);
+                        Log::info('File deleted successfully', ['file_path' => $filePath]);
+                    } else {
+                        Log::warning('File not found on FTP', ['file_path' => $filePath]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error deleting file from FTP', [
+                        'file_path' => $filePath,
+                        'exception' => $e->getMessage(),
+                    ]);
                 }
-               /* // حذف فایل از سیستم
-                if (file_exists(public_path( $model->image->file_path))) {
-                    unlink(public_path( $model->image->file_path));
-                }*/
+
                 // حذف رکورد فایل از دیتابیس
                 $model->image->delete();
-
             }
-            $this->addImage($request,$model);
+
+            // افزودن تصویر جدید
+            $this->addImage($request, $model);
         }
     }
 }
