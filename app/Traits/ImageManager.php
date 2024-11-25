@@ -49,7 +49,8 @@ trait ImageManager
         if ($model->image) {
 
             $disk = 'ftp'; // دیسک FTP
-            Log::info($model->image->file_path, [Storage::disk('ftp')->path($model->image->file_path)]);
+            Log::info('test');
+            Log::info('$model->image->file_path', [Storage::disk('ftp')->path($model->image->file_path)]);
 
             // حذف فایل از FTP
             if (Storage::disk($disk)->exists($model->image->file_path)) {
