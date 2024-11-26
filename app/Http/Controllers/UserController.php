@@ -26,7 +26,7 @@ class UserController extends Controller
 
         #broadcast(new MessageSent('$message : test socket'));
         Log::info('controller');
-        event(new MessageSent('Hello, this is a test message!'));
+        broadcast(new MessageSent('Hello, this is a test message!'));
 
     }
     /**
