@@ -25,12 +25,12 @@ class MessageSent
         $this->message = $message;
     }
 
-    public function broadcastOn()
+    public function broadcastOn(): Channel
     {
         return new Channel('chat');
     }
 
-    public function broadcastAs()
+    public function broadcastAs(): string
     {
         return 'message.sent';
     }
