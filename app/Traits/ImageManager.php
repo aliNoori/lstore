@@ -52,7 +52,7 @@ trait ImageManager
 
             $disk = 'sftp'; // دیسک FTP
             Log::info('test');
-            Log::info('$model->image->file_path', [Storage::disk('ftp')->path($model->image->file_path)]);
+            Log::info('$model->image->file_path', [Storage::path($model->image->file_path)]);
 
             // حذف فایل از FTP
             if (Storage::exists($model->image->file_path)) {
