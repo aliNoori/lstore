@@ -23,7 +23,9 @@ use \App\Http\Controllers\PaymentGatewayController;
 //
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
-
+####test Socket###
+Route::get('/socket',[UserController::class, 'testSocket']);
+####
 Route::group(['prefix' => 'user'], function () {
     // Other routes without middleware
     Route::post('/create', [UserController::class, 'create']);
