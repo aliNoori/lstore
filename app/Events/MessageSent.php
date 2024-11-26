@@ -23,6 +23,7 @@ class MessageSent
     public $message;
     public function __construct($message)
     {
+        Log::info('construct');
         $this->message = $message;
     }
 
