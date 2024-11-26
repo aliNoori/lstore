@@ -28,7 +28,7 @@ trait ImageManager
             // ذخیره فایل در FTP
             $filePath = '/uploads/images/' . $newFileName;
             $disk = 'sftp'; // دیسک مورد استفاده (باید در config/filesystems.php تعریف شود)
-            $result=Storage::disk($disk)->putFileAs('uploads/images', $fileData, $newFileName);
+            $result=Storage::putFileAs('uploads/images', $fileData, $newFileName);
 
             Log::info('File upload result:', ['path' => $result]);
 
@@ -55,8 +55,8 @@ trait ImageManager
             Log::info('$model->image->file_path', [Storage::disk('ftp')->path($model->image->file_path)]);
 
             // حذف فایل از FTP
-            if (Storage::disk($disk)->exists($model->image->file_path)) {
-                Storage::disk($disk)->delete($model->image->file_path);
+            if (Storage::exists($model->image->file_path)) {
+                Storage::delete($model->image->file_path);
             }
            /* // حذف فایل از سیستم
             if (file_exists(public_path( $model->image->file_path))) {
@@ -85,8 +85,8 @@ trait ImageManager
 
                 try {
                     // بررسی وجود فایل و حذف آن
-                    if (Storage::disk($disk)->exists($filePath)) {
-                        Storage::disk($disk)->delete($filePath);
+                    if (Storage::exists($filePath)) {
+                        Storage::delete($filePath);
                         Log::info('File deleted successfully', ['file_path' => $filePath]);
                     } else {
                         Log::warning('File not found on FTP', ['file_path' => $filePath]);
