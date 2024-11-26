@@ -27,7 +27,7 @@ trait ImageManager
             //$filePath = $fileData->storeAs('uploads/images', $newFileName, 'public');
             // ذخیره فایل در FTP
             $filePath = '/uploads/images/' . $newFileName;
-            $disk = 'ftp'; // دیسک مورد استفاده (باید در config/filesystems.php تعریف شود)
+            $disk = 'sftp'; // دیسک مورد استفاده (باید در config/filesystems.php تعریف شود)
             $result=Storage::disk($disk)->putFileAs('uploads/images', $fileData, $newFileName);
 
             Log::info('File upload result:', ['path' => $result]);
@@ -50,7 +50,7 @@ trait ImageManager
         if ($request->hasFile('image')) {
         if ($model->image) {
 
-            $disk = 'ftp'; // دیسک FTP
+            $disk = 'sftp'; // دیسک FTP
             Log::info('test');
             Log::info('$model->image->file_path', [Storage::disk('ftp')->path($model->image->file_path)]);
 
@@ -77,7 +77,7 @@ trait ImageManager
     {
         if ($request->hasFile('image')) {
             if ($model->image) {
-                $disk = 'ftp'; // دیسک FTP
+                $disk = 'sftp'; // دیسک FTP
                 $filePath = $model->image->file_path;
 
                 // لاگ مسیر فایل
