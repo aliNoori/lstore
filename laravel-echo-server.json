@@ -26,10 +26,10 @@
 		"http": true,
 		"redis": true
 	},
-	"apiOriginAllow": {
-		"allowCors": false,
-		"allowOrigin": "",
-		"allowMethods": "",
-		"allowHeaders": ""
-	}
+    "apiOriginAllow": {
+        "allowCors": false,
+        "allowOrigin": "*",
+        "allowMethods": "GET, POST, PUT, DELETE",
+        "allowHeaders": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    }
 }
