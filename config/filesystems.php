@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('FILESYSTEM_DISK', 'ftp'),
+    'default' => env('FILESYSTEM_DISK', 'sftp'),
 
     /*
     |--------------------------------------------------------------------------
@@ -43,7 +43,7 @@ return [
             'visibility' => 'public',
             'throw' => false,
         ],
-        'ftp' => [
+        'sftp' => [
 
             'driver' => env('STORE_FILE_SERVER_DRIVER'),
 
@@ -58,8 +58,8 @@ return [
             'url' => 'http://192.168.1.105/uploads/images', // آدرس وب سرور
             // 'passive'  => true,
             // 'ssl'      => true,
-            // 'timeout'  => 30,
-            // 'port'     => 21,
+             'timeout'  => 30,
+             'port'     => 22,
             // Optional FTP Settings...
         ],
 
