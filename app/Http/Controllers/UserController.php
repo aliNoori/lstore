@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MessageSent;
 use App\Http\Requests\AddressRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\AddressResource;
@@ -19,6 +20,13 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    public function testSocket(): void
+    {
+
+        #broadcast(new MessageSent('$message : test socket'));
+        event(new MessageSent('Hello, this is a test message!'));
+
+    }
     /**
      * Display a user profile.
      *
