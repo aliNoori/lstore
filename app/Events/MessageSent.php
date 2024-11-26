@@ -27,13 +27,13 @@ class MessageSent
         $this->message = $message;
     }
 
-    public function broadcastOn(): Channel
+    public function broadcastOn()
     {
         Log::info('event');
         return new Channel('chat');
     }
 
-    public function broadcastAs(): string
+    public function broadcastAs()
     {
         Log::info('message.sent');
         return 'message.sent';
