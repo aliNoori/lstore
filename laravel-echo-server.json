@@ -13,7 +13,7 @@
 		}
 	},
 	"devMode": true,
-	"host": "http://192.168.1.105",
+	"host": "192.168.1.105",
 	"port": "6001",
 	"protocol": "http",
 	"socketio": {"transports": ["websocket", "polling", "flashsocket"]},
