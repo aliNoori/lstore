@@ -34,8 +34,6 @@ class AppServiceProvider extends ServiceProvider
         //
         Transaction::observe(TransactionObserver::class);
         Broadcast::routes();
-        Broadcast::listen(function ($event) {
-            Log::info('Broadcasting event: ', ['event' => $event]);
-        });
+        Log::info('Broadcasting initialized');
     }
 }
