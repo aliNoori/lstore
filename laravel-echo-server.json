@@ -18,16 +18,10 @@
 		}
 	},
 	"devMode": true,
-	"host": "192.168.1.105",
+	"host": null,
 	"port": "6001",
 	"protocol": "http",
-	"socketio": {
-		"transports": [
-			"websocket",
-			"polling",
-			"flashsocket"
-		]
-	},
+	"socketio": {},
 	"secureOptions": 67108864,
 	"sslCertPath": "",
 	"sslKeyPath": "",
