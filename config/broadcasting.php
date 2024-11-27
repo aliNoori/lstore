@@ -29,7 +29,21 @@ return [
     */
 
     'connections' => [
-
+        'socket.io' => [
+            'driver' => 'pusher',
+            'key' => env('PUSHER_APP_KEY'),
+            'secret' => env('PUSHER_APP_SECRET'),
+            'app_id' => env('PUSHER_APP_ID'),
+            'options' => [
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'encrypted' => true,
+                'host' => '192.168.1.105',
+                'port' => 6001,
+                'scheme' => 'http',
+                'useTLS' => false,
+                'transports' => ['websocket', 'polling', 'flashsocket'],
+            ],
+        ],
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
