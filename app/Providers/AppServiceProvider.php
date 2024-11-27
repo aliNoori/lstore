@@ -5,7 +5,9 @@ namespace App\Providers;
 use App\Models\Transaction;
 use App\Observers\TransactionObserver;
 use App\Services\Payment\PaymentGatewayFactory;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Broadcast;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,5 +33,9 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Transaction::observe(TransactionObserver::class);
+        Broadcast::routes();
+        Broadcast::listen(function ($event) {
+            Log::info('Broadcasting event: ', ['event' => $event]);
+        });
     }
 }
