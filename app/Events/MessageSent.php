@@ -23,7 +23,7 @@ class MessageSent implements ShouldBroadcast
     public function broadcastOn()
     {
         Log::info('BroadcastOn called');
-        return new Channel('public-chat');
+        return new Channel('chat');
     }
 
     public function broadcastAs(): string
