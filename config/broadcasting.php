@@ -29,12 +29,6 @@ return [
     */
 
     'connections' => [
-        'socket' => [
-            'driver' => 'socket',
-            'host' => '192.168.1.105',  // آدرس سرور Echo
-            'port' => 6001,  // پورت سرور Echo
-            'scheme' => 'http',  // اگر از HTTPS استفاده نمی‌کنید
-        ],
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
