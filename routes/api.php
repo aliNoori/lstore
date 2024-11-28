@@ -33,7 +33,7 @@ Route::post('/broadcasting/auth', function (Request $request) {
     ]);
 
     return response()->json(['status' => 'ok']);
-});
+})->middleware('auth:sanctum');
 
 ####
 Route::group(['prefix' => 'user'], function () {
