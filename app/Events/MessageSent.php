@@ -4,6 +4,7 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -20,16 +21,16 @@ class MessageSent implements ShouldBroadcast
         $this->message = $message;
     }
 
-    public function broadcastOn()
+    public function broadcastOn(): Channel|PrivateChannel|array
     {
         Log::info('BroadcastOn called');
-        return new Channel('chat');
+        return new PrivateChannel('chat');
     }
 
     public function broadcastAs(): string
     {
         Log::info('BroadcastAs called');
-        return 'message.sent';
+        return 'OrderCreated';
     }
     public function broadcastWith(): array
     {
