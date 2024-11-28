@@ -25,6 +25,22 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 ####test Socket###
 Route::get('/socket',[UserController::class, 'testSocket']);
+Route::post('/broadcasting/auth', function (Request $request) {
+    // اطلاعات درخواست برای دیباگ
+    \Illuminate\Support\Facades\Log::info('Broadcasting auth hit', [
+        'headers' => $request->headers->all(),
+        'cookies' => $request->cookies->all(),
+        'user' => $request->user(),
+    ]);
+
+    // چک کردن کاربر احراز هویت شده و بازگشت پاسخ
+    if ($request->user()) {
+        return response()->json(['status' => 'ok']);
+    }
+
+    return response()->json(['status' => 'unauthorized'], 403);
+})->middleware('auth:sanctum');
+
 ####
 Route::group(['prefix' => 'user'], function () {
     // Other routes without middleware
