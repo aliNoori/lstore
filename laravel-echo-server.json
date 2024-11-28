@@ -15,6 +15,11 @@
 		}
 	},
 	"devMode": true,
+    "log_level": 3,
+    "debug": {
+        "enabled": true,
+        "engine": "socket.io"
+    },
 	"host": null,
 	"port": "6001",
 	"protocol": "http",
