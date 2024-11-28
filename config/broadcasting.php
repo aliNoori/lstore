@@ -29,20 +29,11 @@ return [
     */
 
     'connections' => [
-        'socket.io' => [
-            'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
-            'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
-                'encrypted' => true,
-                'host' => '192.168.1.105',
-                'port' => 6001,
-                'scheme' => 'http',
-                'useTLS' => false,
-                'transports' => ['websocket', 'polling', 'flashsocket'],
-            ],
+        'socket' => [
+            'driver' => 'socket',
+            'host' => '192.168.1.105',  // آدرس سرور Echo
+            'port' => 6001,  // پورت سرور Echo
+            'scheme' => 'http',  // اگر از HTTPS استفاده نمی‌کنید
         ],
         'pusher' => [
             'driver' => 'pusher',
