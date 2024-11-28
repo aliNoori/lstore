@@ -1,45 +1,51 @@
 {
-	"authHost": "http://192.168.1.105",
-	"authEndpoint": "broadcasting/auth",
-	"clients": [
-		{
-			"appId": "APP_ID",
-			"key": "d3c52f9e85333e9d5d17a2833ce2806c"
-		}
-	],
-	"database": "redis",
-	"databaseConfig": {
-		"redis": {
-			"host": "127.0.0.1",
-			"port": "6379"
-		},
-		"sqlite": {
-			"databasePath": "/database/laravel-echo-server.sqlite"
-		}
-	},
-	"devMode": true,
-	"host": null,
-	"port": "6001",
-	"protocol": "http",
-	"socketio": {},
-	"secureOptions": 67108864,
-	"sslCertPath": "",
-	"sslKeyPath": "",
-	"sslCertChainPath": "",
-	"sslPassphrase": "",
-	"subscribers": {
-		"http": true,
-		"redis": true
-	},
+    "authHost": "http://192.168.1.105",
+    "authEndpoint": "broadcasting/auth",
+    "clients": [
+        {
+            "appId": "APP_ID",
+            "key": "d3c52f9e85333e9d5d17a2833ce2806c"
+        }
+    ],
+    "database": "redis",
+    "databaseConfig": {
+        "redis": {
+            "host": "127.0.0.1",
+            "port": "6379"
+        },
+        "sqlite": {
+            "databasePath": "/database/laravel-echo-server.sqlite"
+        }
+    },
+    "devMode": true,
+    "host": null,
+    "port": "6001",
+    "protocol": "http",
+    "socketio": {},
+    "secureOptions": 67108864,
+    "sslCertPath": "",
+    "sslKeyPath": "",
+    "sslCertChainPath": "",
+    "sslPassphrase": "",
+    "subscribers": {
+        "http": true,
+        "redis": true
+    },
     "auth": {
         "headers": {
             "Authorization": "Bearer {token}"
         }
     },
-	"apiOriginAllow": {
-		"allowCors": true,
-		"allowOrigin": "*",
-		"allowMethods": "GET, POST, PUT, DELETE",
-		"allowHeaders": "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-App-ID, X-App-Key"
-	}
+    "apiOriginAllow": {
+        "allowCors": true,
+        "allowOrigin": [
+            "http://192.168.1.100",
+            "http://localhost",
+            "http://192.168.1.100:3000",
+            "http://localhost:3000"
+        ],
+        "allowMethods": "GET, POST, PUT, DELETE",
+        "allowHeaders": "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-App-ID, X-App-Key"
+    },
+    "log_level": 3
 }
