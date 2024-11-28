@@ -33,5 +33,8 @@ class AppServiceProvider extends ServiceProvider
     {
         //
         Transaction::observe(TransactionObserver::class);
+        Broadcast::routes(['middleware' => ['web', 'auth']]);
+
+        require base_path('routes/channels.php');
     }
 }
