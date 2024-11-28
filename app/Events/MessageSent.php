@@ -21,10 +21,10 @@ class MessageSent implements ShouldBroadcast
         $this->message = $message;
     }
 
-    public function broadcastOn(): Channel|PrivateChannel|array
+    public function broadcastOn(): Channel
     {
         Log::info('BroadcastOn called');
-        return new PrivateChannel('chat');
+        return new Channel('chat');
     }
 
     public function broadcastAs(): string
