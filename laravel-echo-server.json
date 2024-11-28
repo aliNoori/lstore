@@ -31,10 +31,15 @@
 		"http": true,
 		"redis": true
 	},
+    "auth": {
+        "headers": {
+            "Authorization": "Bearer {token}"
+        }
+    },
 	"apiOriginAllow": {
 		"allowCors": true,
 		"allowOrigin": "*",
 		"allowMethods": "GET, POST, PUT, DELETE",
-		"allowHeaders": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+		"allowHeaders": "Origin, X-Requested-With, Content-Type, Accept, Authorization, X-App-ID, X-App-Key"
 	}
 }
