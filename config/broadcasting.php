@@ -54,7 +54,7 @@ return [
         'redis' => [
             'driver' => 'redis',
             'connection' => 'default',
-            #'channel' => 'laravel_database_chat',
+            'channel' => 'laravel_database_chat',
         ],
 
         'log' => [
