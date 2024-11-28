@@ -25,6 +25,16 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 ####test Socket###
 Route::get('/socket',[UserController::class, 'testSocket']);
+Route::post('/broadcasting/auth', function (Request $request) {
+    \Illuminate\Support\Facades\Log::info('Broadcasting auth hit', [
+        'headers' => $request->headers->all(),
+        'cookies' => $request->cookies->all(),
+        'user' => $request->user(),
+    ]);
+
+    return response()->json(['status' => 'ok']);
+});
+
 ####
 Route::group(['prefix' => 'user'], function () {
     // Other routes without middleware
