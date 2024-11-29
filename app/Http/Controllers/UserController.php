@@ -14,6 +14,7 @@ use App\Http\Resources\UserResource;
 use App\Http\Resources\WalletResource;
 use App\Models\File;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -26,15 +27,18 @@ class UserController extends Controller
     {
 
         broadcast(new MessageSent($request->message_public));
-        broadcast(new OrderEvent($request->message_private));
+        broadcast(new OrderEvent($request->order_id));
 
     }
+
     /**
      * Display a user profile.
      *
+     * @param Request $request
      * @return UserResource
+     * @throws AuthorizationException
      */
-    public function profile(Request $request)
+    public function profile(Request $request): UserResource
     {
         $user=$request->user();
         $this->authorize('view', $user);
