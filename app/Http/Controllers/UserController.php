@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
+use App\Events\OrderEvent;
 use App\Http\Requests\AddressRequest;
 use App\Http\Requests\UserRequest;
 use App\Http\Resources\AddressResource;
@@ -24,9 +25,8 @@ class UserController extends Controller
     public function testSocket(Request $request): void
     {
 
-        #broadcast(new MessageSent('$message : test socket'));
-        Log::info('controller');
-        broadcast(new MessageSent($request->message));
+        broadcast(new MessageSent($request->message_public));
+        broadcast(new OrderEvent($request->message_private));
 
     }
     /**
