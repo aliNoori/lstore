@@ -19,4 +19,8 @@ Broadcast::channel('chat', function ($user) {
     \Illuminate\Support\Facades\Log::info('CHANNEL',[$user]);
     return true; // دسترسی باز
 });
+Broadcast::channel('order', function ($user) {
+    \Illuminate\Support\Facades\Log::info('PrivateCHANNEL',[$user]);
+    return true; // دسترسی باز
+});
 
