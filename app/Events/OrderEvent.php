@@ -14,17 +14,17 @@ class OrderEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $message;
+    public $order_id;
 
-    public function __construct($message)
+    public function __construct($order_id)
     {
-        $this->message = $message;
+        $this->order_id = $order_id;
     }
 
     public function broadcastOn(): Channel|PrivateChannel
     {
-        Log::info('BroadcastOn called');
-        return new PrivateChannel('order');
+        Log::info('BroadcastOn called'.'order-'.$this->order_id);
+        return new PrivateChannel('order-'.$this->order_id);
     }
 
     public function broadcastAs(): string
@@ -34,9 +34,9 @@ class OrderEvent implements ShouldBroadcast
     }
     public function broadcastWith(): array
     {
-        Log::info('Broadcasting data:', ['message' => $this->message]);
+        Log::info('Broadcasting data:', ['order_id' => $this->order_id]);
         return [
-            'message' => $this->message,
+            'order_id' => $this->order_id
         ];
     }
 
