@@ -19,7 +19,7 @@ Broadcast::channel('chat', function ($user) {
     \Illuminate\Support\Facades\Log::info('CHANNEL',[$user]);
     return true; // دسترسی باز
 });
-Broadcast::channel('private-order-{orderId}', function ($user, $orderId) {
+Broadcast::channel('order-{orderId}', function ($user, $orderId) {
     // بررسی دسترسی کاربر
     \Illuminate\Support\Facades\Log::info('CHANNEL',[$user]);
     return $user->id === \App\Models\Order::find($orderId)->user_id;
