@@ -21,7 +21,7 @@ class MessageSent implements ShouldBroadcast
         $this->message = $message;
     }
 
-    public function broadcastOn(): Channel
+    public function broadcastOn()
     {
         Log::info('BroadcastOn called');
         return new Channel('chat');
