@@ -21,12 +21,12 @@ use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
-    public function testSocket(): void
+    public function testSocket(Request $request): void
     {
 
         #broadcast(new MessageSent('$message : test socket'));
         Log::info('controller');
-        broadcast(new MessageSent('Hello, Ali!'));
+        broadcast(new MessageSent($request->message));
 
     }
     /**
