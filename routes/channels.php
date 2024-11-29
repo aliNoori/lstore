@@ -19,7 +19,7 @@ Broadcast::channel('chat', function ($user) {
     \Illuminate\Support\Facades\Log::info('CHANNEL',[$user]);
     return true; // دسترسی باز
 });
-Broadcast::channel('private-order-{orderId}', function ($user,$orderId) {
+Broadcast::channel('private-laravel_database_private-order-{orderId}', function ($user,$orderId) {
     \Illuminate\Support\Facades\Log::info('PrivateCHANNEL',[$orderId]);
     return true; // دسترسی باز
 });
