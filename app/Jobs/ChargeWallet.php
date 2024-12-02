@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Events\ChargeWalletEvent;
+use App\Helpers\MessageHelper;
 use App\Models\User;
 use App\Models\Wallet;
 use Illuminate\Bus\Queueable;
@@ -59,6 +61,15 @@ class ChargeWallet implements ShouldQueue
             // افزایش موجودی کیف پول
             $wallet->balance = bcadd($wallet->balance, $amountToAdd, 2);
             $wallet->save();
+
+            $variables = [
+                'user_name' => $user->name,
+                'charge_amount'=>$this->amount,
+            ];
+
+            $message = MessageHelper::getMessage('charge_wallet', $variables);
+
+            broadcast(new ChargeWalletEvent($user,$message));
 
             Log::info("Successfully charged wallet for user {$this->userId} with amount {$amountToAdd}");
 

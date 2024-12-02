@@ -1,6 +1,8 @@
 <?php
 namespace App\Jobs;
 
+use App\Events\AddScoreEvent;
+use App\Helpers\MessageHelper;
 use App\Models\User;
 use App\Models\Score;
 use Illuminate\Bus\Queueable;
@@ -33,5 +35,14 @@ class AddScore implements ShouldQueue
             'reason' => $this->reason,
             'description' => $this->description,
         ]);
+
+        $variables = [
+            'user_name' => $user->name,
+            'score_increase'=>$this->score,
+        ];
+
+        $message = MessageHelper::getMessage('add_score', $variables);
+
+        broadcast(new AddScoreEvent($user,$message));
     }
 }

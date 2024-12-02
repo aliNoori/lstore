@@ -37,4 +37,4 @@ jobs:
            sudo a2ensite store.laravel.local.conf
            sudo systemctl restart apache2
       - name: Check application health
-        run: curl -f http://2.181.205.82/health-check
+        run: curl -f http://89.38.94.136/health-check

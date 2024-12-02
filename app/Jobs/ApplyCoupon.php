@@ -1,6 +1,8 @@
 <?php
 namespace App\Jobs;
 
+use App\Events\ApplyCouponEvent;
+use App\Helpers\MessageHelper;
 use App\Models\Order;
 use App\Models\Coupon;
 use Carbon\Carbon;
@@ -43,5 +45,14 @@ class ApplyCoupon implements ShouldQueue
         ]);
 
         Log::info("Coupon {$this->code} applied to user {$user->username} for order {$this->orderId}.");
+
+        $variables = [
+            'user_name' => $user->name,
+            'coupon_code'=>$this->code,
+        ];
+
+        $message = MessageHelper::getMessage('apply_coupon', $variables);
+
+        broadcast(new ApplyCouponEvent($user,$message));
     }
 }
