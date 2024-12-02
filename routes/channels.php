@@ -22,4 +22,24 @@ Broadcast::channel('order-{orderId}', function ($user, $orderId) {
     // بررسی دسترسی کاربر
     return $user->id === \App\Models\Order::find($orderId)->user_id;
 });
+Broadcast::channel('add-score-{userId}', function ($user, $userId) {
+    // بررسی دسترسی کاربر
+    return (int)$user->id === (int)$userId;
+});
+Broadcast::channel('apply-coupon-{userId}', function ($user, $userId) {
+    // بررسی دسترسی کاربر
+    return (int)$user->id === (int)$userId;
+});
+Broadcast::channel('add-user-to-lottery-{userId}', function ($user, $userId) {
+    // بررسی دسترسی کاربر
+    return (int)$user->id === (int)$userId;
+});
+Broadcast::channel('charge-wallet-{userId}', function ($user, $userId) {
+    // بررسی دسترسی کاربر
+    return (int)$user->id === (int)$userId;
+});
+Broadcast::channel('handle-high-value-order-{userId}', function ($user, $userId) {
+    // بررسی دسترسی کاربر
+    return (int)$user->id === (int)$userId;
+});
 
