@@ -41,11 +41,9 @@ class AddScore implements ShouldQueue
             'user_name' => $user->name,
             'score_increase'=>$this->score,
         ];
-        Log::info('message',[$variables]);
 
         $message = MessageHelper::getMessage('add_score', $variables);
 
-        Log::info('message',[$message]);
 
         broadcast(new AddScoreEvent($user,$message));
     }
