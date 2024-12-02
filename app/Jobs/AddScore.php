@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 
 class AddScore implements ShouldQueue
 {
@@ -40,8 +41,11 @@ class AddScore implements ShouldQueue
             'user_name' => $user->name,
             'score_increase'=>$this->score,
         ];
+        Log::info('message',[$variables]);
 
         $message = MessageHelper::getMessage('add_score', $variables);
+
+        Log::info('message',[$message]);
 
         broadcast(new AddScoreEvent($user,$message));
     }
