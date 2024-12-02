@@ -24,6 +24,7 @@ Broadcast::channel('order-{orderId}', function ($user, $orderId) {
 });
 Broadcast::channel('add-score-{userId}', function ($user, $userId) {
     // بررسی دسترسی کاربر
+    \Illuminate\Support\Facades\Log::info('(int)$user->id,(int)$userId',[(int)$user->id,(int)$userId]);
     return (int)$user->id === (int)$userId;
 });
 Broadcast::channel('apply-coupon-{userId}', function ($user, $userId) {
