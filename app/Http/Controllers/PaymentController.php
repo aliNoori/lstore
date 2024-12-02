@@ -125,7 +125,7 @@ class PaymentController extends Controller
         $query_params['auth_token'] = $user->createToken('UserToken')->plainTextToken;
 
         //$url = 'http://localhost:3000/your-transaction-receive';
-        $url = 'http://192.168.1.100/your-transaction-receive';
+        $url = 'http://192.168.1.101/your-transaction-receive';
         $redirect_url = $url . '?' . http_build_query($query_params);
 
         return Redirect::to($redirect_url);
