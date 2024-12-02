@@ -1,6 +1,8 @@
 <?php
 namespace App\Helpers;
 
+use Illuminate\Support\Facades\Log;
+
 class MessageHelper
 {
     /**
@@ -14,10 +16,12 @@ class MessageHelper
     {
         // دریافت پیام از فایل زبان
         $message = trans('messages.' . $key);
+        Log::info('new',[$message]);
 
         // جایگزینی متغیرها
         foreach ($variables as $variable => $value) {
             $message = str_replace("{{ $variable }}", $value, $message);
+            Log::info('for',[$message]);
         }
 
         return $message;
