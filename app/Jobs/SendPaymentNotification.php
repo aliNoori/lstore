@@ -2,6 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Events\SendPaymentNotificationEvent;
+use App\Helpers\MessageHelper;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,14 +16,19 @@ class SendPaymentNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $message;
+    protected $user;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($user,$message)
     {
         //
+        $this->message=$message;
+        $this->user=$user;
     }
 
     /**
@@ -28,8 +36,10 @@ class SendPaymentNotification implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         //
+        //$message = MessageHelper::getMessage('add_score', $variables);
+        broadcast(new SendPaymentNotificationEvent($this->user,$this->message));
     }
 }
