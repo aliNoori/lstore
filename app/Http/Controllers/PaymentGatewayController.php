@@ -110,8 +110,8 @@ class PaymentGatewayController extends Controller
         $action = match ($paymentMethod->type) {
             'credit_card' => 'Processing credit card payment',
             'paypal' => 'Processing PayPal payment',
-            'Online' => 'Processing online payment',
-            'Offline' => 'Processing offline payment',
+            'Online' => 'Online',//'Processing online payment',
+            'Offline' => 'Offline',//Processing offline payment',
             'Wallet' => 'Processing wallet payment',
             'bank_transfer' => 'Processing bank transfer payment',
             'cash_on_delivery' => 'Processing cash on delivery',
