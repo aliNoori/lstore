@@ -43,4 +43,9 @@ Broadcast::channel('handle-high-value-order-{userId}', function ($user, $userId)
     // بررسی دسترسی کاربر
     return (int)$user->id === (int)$userId;
 });
+Broadcast::channel('send-payment-notification-{userId}', function ($user, $userId) {
+    // بررسی دسترسی کاربر
+    //return (int)$user->id === (int)$userId;
+    return true;
+});
 
