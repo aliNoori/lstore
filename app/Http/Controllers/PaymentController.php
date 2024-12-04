@@ -55,7 +55,6 @@ class PaymentController extends Controller
         // بازگشت لینک پرداخت به فرمت JSON
         return response()->json(['url' => $url], 200, [], JSON_UNESCAPED_SLASHES);
     }
-
     /**
      * پردازش پاسخ بازگشت از درگاه پرداخت
      *
