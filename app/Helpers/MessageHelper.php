@@ -16,13 +16,10 @@ class MessageHelper
     {
         // دریافت پیام از فایل زبان
         $message = trans('messages.' . $key);
-        Log::info('new',[$message]);
-
         // بررسی وجود پیام
         if (!$message || !is_string($message)) {
             return "پیام با کلید '{$key}' پیدا نشد.";
         }
-
         // جایگزینی متغیرها
         foreach ($variables as $variable => $value) {
             $message = str_replace("{{ $variable }}", $value, $message);

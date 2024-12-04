@@ -45,7 +45,7 @@ class PaymentController extends Controller
             'url' => $url
         ], 200, [], JSON_UNESCAPED_SLASHES); // پارامتر JSON_UNESCAPED_SLASHES برای جلوگیری از اسکیپ شدن اسلش‌ها
     }
-    public function callbackPayment(Request $request)
+    public function callbackPayment(Request $request): \Illuminate\Http\RedirectResponse
     {
         // متغیر `error_message` در صورت وجود
         $error_message = $request->CallbackError ?? null;
