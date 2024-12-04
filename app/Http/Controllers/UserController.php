@@ -12,207 +12,130 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\ScoreResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\WalletResource;
-use App\Models\File;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
     public function testSocket(Request $request): void
     {
-
         broadcast(new MessageSent($request->message_public));
         broadcast(new OrderEvent($request->order_id));
-
     }
 
-    /**
-     * Display a user profile.
-     *
-     * @param Request $request
-     * @return UserResource
-     * @throws AuthorizationException
-     */
     public function profile(Request $request): UserResource
     {
-        $user=$request->user();
+        $user = $request->user();
         $this->authorize('view', $user);
         return new UserResource($user);
-        // نمایش پروفایل کاربر فعلی
     }
-    /**
-     * Display a listing of the resource.
-     *
-     * @return JsonResponse
-     */
+
     public function usersList(): JsonResponse
     {
-        //
-        //TODO:register role admin
-        $users=User::all();
-        // بازگشت مجموعه‌ای از منابع
+        $users = User::all();
         return response()->json([
-            'users_list'=>UserResource::collection($users),
-            //'token'=>$token,
+            'users_list' => UserResource::collection($users),
         ]);
-        //return UserResource::collection($users);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @param UserRequest $request
-     * @return JsonResponse
-     */
     public function create(UserRequest $request): JsonResponse
     {
-        //
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
+        $validatedData = $request->validated();
 
-        // هش کردن رمز عبور برای کاربر
+        // Hash the password if provided
         if (!empty($validatedData['password'])) {
             $validatedData['password'] = Hash::make($validatedData['password']);
         }
 
-        $user=User::create($validatedData);
+        $user = User::create($validatedData);
+        $user->addImage($request, $user);
+        $user->assignRole('admin');  // Assign default role to admin
 
-        $user->addImage($request,$user);
-
-        $user->assignRole('admin');
-
-        ///token created for user
+        // Token created for user
         $token = $user->createToken('authToken', ['read', 'write'])->plainTextToken;
 
         return response()->json([
-            'user'=>new UserResource($user),
-            'token'=>$token,
+            'user' => new UserResource($user),
+            'token' => $token,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(UserRequest $request)
+    public function show($id): JsonResponse
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return JsonResponse
-     */
-    public function show($id)
-    {
-        //
-        $user=User::find($id);
-        $this->authorize('view', $user);
-        return response()->json([
-            'message'=>new UserResource($user)
-        ]);
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return JsonResponse
-     */
-    public function update(UserRequest $request, $id)
-    {
-        //
-        $user=User::find($id);
-
-        // این کد متد 'update' را در UserPolicy فراخوانی می‌کند
-        $this->authorize('update', $user);
-
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
-
-        // هش کردن رمز عبور برای کاربر
-        if (!empty($validatedData['password'])) {
-            $validatedData['password'] = Hash::make($validatedData['password']);
+        try {
+            $user = User::findOrFail($id);
+            $this->authorize('view', $user);
+            return response()->json([
+                'message' => new UserResource($user),
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'User not found'], 404);
         }
-        $user->update($validatedData);
-        $user->updatedImageIfExist($request,$user);
-
-        // دوباره بارگیری کردن مدل از دیتابیس برای به‌روزرسانی اطلاعات
-        $user->refresh();
-
-        return response()->json([
-            'user'=>new UserResource($user),
-        ]);
-
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return JsonResponse
-     */
-    public function delete(Request $request,$id)
+    public function update(UserRequest $request, $id): JsonResponse
     {
-        //
-        $user=User::find($id);
-        $this->authorize('delete', $user);
-        $user->delete();
-        $user->deletedImageIfExist($request,$user);
-        return response()->json([
-            'message'=>$user->name.'deleted',
-        ]);
+        try {
+            $user = User::findOrFail($id);
+            $this->authorize('update', $user);
+
+            $validatedData = $request->validated();
+
+            // Hash the password if provided
+            if (!empty($validatedData['password'])) {
+                $validatedData['password'] = Hash::make($validatedData['password']);
+            }
+
+            $user->update($validatedData);
+            $user->updatedImageIfExist($request, $user);
+            $user->refresh();
+
+            return response()->json([
+                'user' => new UserResource($user),
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
     }
+
+    public function delete(Request $request, $id): JsonResponse
+    {
+        try {
+            $user = User::findOrFail($id);
+            $this->authorize('delete', $user);
+
+            $user->deletedImageIfExist($request, $user);
+            $user->delete();
+
+            return response()->json([
+                'message' => $user->name . ' deleted successfully',
+            ]);
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+    }
+
     public function addAddress(AddressRequest $request): JsonResponse
     {
-        // پیدا کردن کاربر
         $user = $request->user();
-
-        //
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
-
-        // ایجاد آدرس جدید برای کاربر
+        $validatedData = $request->validated();
         $address = $user->addresses()->create($validatedData);
 
-        // بازگشت موفقیت‌آمیز
         return response()->json([
             'success' => true,
             'message' => 'Address added successfully',
-            'address' => new AddressResource($address)
+            'address' => new AddressResource($address),
         ], 201);
     }
+
     public function editAddress(AddressRequest $request, $addressId): JsonResponse
     {
-        // پیدا کردن کاربر
         $user = $request->user();
-
-        // پیدا کردن آدرس کاربر که باید ویرایش شود
         $address = $user->addresses()->find($addressId);
 
-        // بررسی وجود آدرس
         if (!$address) {
             return response()->json([
                 'success' => false,
@@ -220,98 +143,61 @@ class UserController extends Controller
             ], 404);
         }
 
-        // دریافت داده‌های معتبر
-        $validatedData = $request->validated(); // استفاده از داده‌های معتبر شده
-
-        // به‌روزرسانی آدرس با داده‌های جدید
+        $validatedData = $request->validated();
         $address->update($validatedData);
 
-        // بازگشت موفقیت‌آمیز
         return response()->json([
             'success' => true,
             'message' => 'Address updated successfully',
-            'address' => new AddressResource($address)
-        ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
+            'address' => new AddressResource($address),
+        ], 200);
     }
 
     public function addresses(Request $request): JsonResponse
     {
-        // پیدا کردن کاربر
         $user = $request->user();
-
-        // دریافت همه آدرس‌های کاربر
         $addresses = $user->addresses()->get();
 
-        // بازگشت موفقیت‌آمیز با لیست آدرس‌ها
-        //return AddressResource::collection($addresses);
         return response()->json([
             'success' => true,
-            'message' => 'Address updated successfully',
-            'addresses' => AddressResource::collection($addresses)
-        ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
+            'addresses' => AddressResource::collection($addresses),
+        ], 200);
     }
+
     public function myWallet(Request $request): JsonResponse
     {
-        // پیدا کردن کاربر
         $user = $request->user();
-
-        // دریافت همه آدرس‌های کاربر
         $wallet = $user->wallet()->first();
 
-        // بازگشت موفقیت‌آمیز با لیست آدرس‌ها
-        //return AddressResource::collection($addresses);
         return response()->json([
             'success' => true,
-            //'message' => 'Address updated successfully',
-            'wallet' => new WalletResource($wallet)
-        ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
+            'wallet' => new WalletResource($wallet),
+        ], 200);
     }
+
     public function myScores(Request $request): JsonResponse
     {
-        // پیدا کردن کاربر
-        $user = $request->user();
-
-        // دریافت همه آدرس‌های کاربر
-        $scores = $user->scores()->get();
-
-        // بازگشت موفقیت‌آمیز با لیست آدرس‌ها
-        //return AddressResource::collection($addresses);
-        return response()->json([
-            'success' => true,
-            //'message' => 'Address updated successfully',
-            'scores' => ScoreResource::collection($scores)
-        ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
+        return $this->getUserResource($request, 'scores', ScoreResource::class);
     }
+
     public function myCoupons(Request $request): JsonResponse
     {
-        // پیدا کردن کاربر
-        $user = $request->user();
-
-        // دریافت همه آدرس‌های کاربر
-        $coupons = $user->coupons()->get();
-
-        // بازگشت موفقیت‌آمیز با لیست آدرس‌ها
-        //return AddressResource::collection($addresses);
-        return response()->json([
-            'success' => true,
-            //'message' => 'Address updated successfully',
-            'coupons' => CouponResource::collection($coupons)
-        ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
+        return $this->getUserResource($request, 'coupons', CouponResource::class);
     }
+
     public function myOrders(Request $request): JsonResponse
     {
-        // پیدا کردن کاربر
+        return $this->getUserResource($request, 'orders', OrderResource::class);
+    }
+
+    private function getUserResource(Request $request, $relation, $resourceClass): JsonResponse
+    {
         $user = $request->user();
+        $data = $user->$relation()->get();
 
-        // دریافت همه آدرس‌های کاربر
-        $orders = $user->orders()->get();
-
-        // بازگشت موفقیت‌آمیز با لیست آدرس‌ها
-        //return AddressResource::collection($addresses);
         return response()->json([
             'success' => true,
-            //'message' => 'Address updated successfully',
-            'orders' => OrderResource::collection($orders)
-        ], 200);  // از کد 200 برای به‌روزرسانی موفقیت‌آمیز استفاده می‌کنیم
+            $relation => $resourceClass::collection($data),
+        ], 200);
     }
 }

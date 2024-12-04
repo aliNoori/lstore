@@ -9,226 +9,212 @@ use App\Models\Like;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection
      */
-    public function index()
+    public function index(): AnonymousResourceCollection
     {
-        //
-        $product=Product::all();
-        // بازگشت مجموعه‌ای از منابع
-        return ProductResource::collection($product);
+        // گرفتن تمام محصولات
+        $products = Product::all();
+        return ProductResource::collection($products);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Create a new product.
      *
+     * @param ProductRequest $request
      * @return ProductResource
      */
-    public function create(ProductRequest $request)
+    public function create(ProductRequest $request): ProductResource
     {
-        //
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
+        $validatedData = $request->validated();
+        $product = Product::create($validatedData);
+        $product->addImage($request, $product);
 
-        // این کد متد 'create' را در UserProduct فراخوانی می‌کند
-        //$this->authorize('create', $product);
-
-
-        $product=Product::create($validatedData);
-        $product->addImage($request,$product);
-
-        return new ProductResource($product);
-
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return ProductResource
-     */
-    public function show($id)
-    {
-        //
-        //
-        $product=Product::find($id);
-
-        //$this->authorize('view', $product);
         return new ProductResource($product);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Display a single product by ID.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse|ProductResource
      */
-    public function update(Request $request, int $id): \Illuminate\Http\JsonResponse
+    public function show(int $id): JsonResponse|ProductResource
     {
-        //
-        $product=Product::find($id);
+        try {
+            $product = Product::findOrFail($id);
+            return new ProductResource($product);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+    }
 
-        // این کد متد 'update' را در UserProduct فراخوانی می‌کند
-        //$this->authorize('update', $product);
+    /**
+     * Update the specified product.
+     *
+     * @param ProductRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(ProductRequest $request, int $id): JsonResponse
+    {
+        try {
+            $product = Product::findOrFail($id);
 
-// قیمت فعلی محصول را ذخیره می‌کنیم
-        $oldPrice = $product->price;
+            $oldPrice = $product->price;
+            $validatedData = $request->validated();
+            $product->update($validatedData);
 
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
+            if ($oldPrice != $product->price) {
+                History::create([
+                    'product_id' => $product->id,
+                    'price_history' => $oldPrice,
+                ]);
+            }
 
-        $product->update($validatedData);
+            $product->updatedImageIfExist($request, $product);
+            $product->refresh();
 
-// اگر قیمت تغییر کرده باشد
-        if ($oldPrice != $product->price) {
-            // ایجاد یک رکورد جدید در تاریخچه
-            $history = History::create([
-                'product_id' => $product->id,
-                'price_history' => $oldPrice, // قیمت قبلی را به عنوان تاریخچه ذخیره می‌کنیم
-            ]);
+            return response()->json(['product' => new ProductResource($product)]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+    }
+
+    /**
+     * Delete a product.
+     *
+     * @param ProductRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function delete(ProductRequest $request, int $id): JsonResponse
+    {
+        try {
+            $product = Product::findOrFail($id);
+            $this->authorize('delete', $product);
+
+            $product->delete();
+            $product->deletedImageIfExist($request, $product);
+
+            return response()->json(['message' => "{$product->name} deleted successfully"]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Product not found'], 404);
+        }
+    }
+
+    /**
+     * Increment product view count.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return ProductResource
+     */
+    public function view(Request $request, int $id): ProductResource
+    {
+        $product = Product::findOrFail($id);
+        $user = $product->getUser($request);
+
+        View::create(['product_id' => $product->id, 'user_id' => $user->id]);
+
+        $product->refresh();
+
+        return new ProductResource($product);
+    }
+
+    /**
+     * Add like to product.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return ProductResource
+     */
+    public function like(Request $request, int $id): ProductResource
+    {
+        $product = Product::findOrFail($id);
+        $user = $product->getUser($request);
+
+        // Avoid duplicate likes
+        $existingLike = Like::where('product_id', $product->id)->where('user_id', $user->id)->first();
+        if (!$existingLike) {
+            Like::create(['product_id' => $product->id, 'user_id' => $user->id]);
         }
 
-
-        $product->updatedImageIfExist($request,$product);
-
-        // دوباره بارگیری کردن مدل از دیتابیس برای به‌روزرسانی اطلاعات
         $product->refresh();
 
-
-        return response()->json([
-            'product'=>new ProductResource($product),
-        ]);
+        return new ProductResource($product);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove like from product.
      *
+     * @param Request $request
      * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return ProductResource
      */
-    public function delete(ProductRequest $request, int $id): \Illuminate\Http\JsonResponse
+    public function disLike(Request $request, int $id): ProductResource
     {
-        //
-        //
-        $product=Product::find($id);
-        $this->authorize('delete', $product);
-        $product->delete();
-        $product->deletedImageIfExist($request,$product);
-        return response()->json([
-            'message'=>$product->name.'deleted',
-        ]);
-    }
-
-
-    public function view(Request $request,$id): ProductResource
-    {
-        //
-        $product=Product::find($id);
-        $user=$product->getUser($request);
-
-        $view=View::create(['product_id'=>$product->id,
-            'user_id'=>$user->id]);
-
-        $product->refresh();
-
-        return new ProductResource($product);
-    }
-    public function like(Request $request,$id): ProductResource
-    {
-        //
-        //
-        $product=Product::find($id);
-        $user=$product->getUser($request);
-
-        $like=Like::create(['product_id'=>$product->id,
-            'user_id'=>$user->id]);
-
-        $product->refresh();
-
-        return new ProductResource($product);
-    }
-    public function disLike(Request $request,$id): ProductResource
-    {
-        //
-        //
-        $product=Product::find($id);
-
-        $user=$product->getUser($request);
+        $product = Product::findOrFail($id);
+        $user = $product->getUser($request);
 
         $like = Like::where('product_id', $product->id)
             ->where('user_id', $user->id)
             ->first();
 
-
-        $dislike=$like->delete();
+        if ($like) {
+            $like->delete();
+        }
 
         $product->refresh();
 
         return new ProductResource($product);
     }
-    public function review(Request $request,$id): ProductResource
+
+    /**
+     * Add review to product.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return ProductResource
+     */
+    public function review(Request $request, int $id): ProductResource
     {
-        //
-        $product=Product::find($id);
+        $product = Product::findOrFail($id);
+        $user = $product->getUser($request);
 
-        $user=$product->getUser($request);
-
-        $review=Review::create([
-
-            'product_id'=>$product->id,
-            'user_id'=>$user->id,
-            'rating'=>$request->rating,
-            'review'=>$request->review,
-
+        Review::create([
+            'product_id' => $product->id,
+            'user_id' => $user->id,
+            'rating' => $request->rating,
+            'review' => $request->review,
         ]);
 
         $product->refresh();
 
         return new ProductResource($product);
-
     }
-    public function histories($id): \Illuminate\Http\JsonResponse
+
+    /**
+     * Get product price history.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function histories(int $id): JsonResponse
     {
-        //
-        //
-        $product=Product::find($id);
+        $product = Product::findOrFail($id);
+        $histories = History::where('product_id', $product->id)->get();
 
-        $histories=History::where('product_id',$product->id)->get();
-
-        return response()->json([
-
-            'histories'=>$histories
-
-        ]);
+        return response()->json(['histories' => $histories]);
     }
 }

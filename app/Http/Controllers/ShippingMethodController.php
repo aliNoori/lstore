@@ -7,105 +7,104 @@ use App\Http\Resources\ShippingMethodResource;
 use App\Models\ShippingMethod;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ShippingMethodController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return JsonResponse
      */
     public function list(): JsonResponse
     {
-        //
-        $shippingMethods=ShippingMethod::all();
+        $shippingMethods = ShippingMethod::all();
         return response()->json([
-            'shippingMethods'=>ShippingMethodResource::collection($shippingMethods)]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(ShippingMethodRequest $request): ShippingMethodResource
-    {
-        //
-        //
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
-
-        $shippingMethod=ShippingMethod::create($validatedData);
-
-        $shippingMethod->addimage($request,$shippingMethod);
-
-        return new ShippingMethodResource($shippingMethod);
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return ShippingMethodResource
-     */
-    public function show($id): ShippingMethodResource
-    {
-        //
-        $shippingMethod=ShippingMethod::find($id);
-
-        //$this->authorize('view', $category);
-        return new ShippingMethodResource($shippingMethod);
-    }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  ShippingMethodRequest  $request
-     * @param  int  $id
-     * @return JsonResponse
-     */
-    public function update(ShippingMethodRequest $request, $id): JsonResponse
-    {
-        //
-        //
-        $shippingMethod=ShippingMethod::find($id);
-
-        // این کد متد 'update' را در UserProduct فراخوانی می‌کند
-        //$this->authorize('update', $category);
-
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
-
-        $shippingMethod->update($validatedData);
-
-        $shippingMethod->updatedImageIfExist($request,$shippingMethod);
-
-        // دوباره بارگیری کردن مدل از دیتابیس برای به‌روزرسانی اطلاعات
-        $shippingMethod->refresh();
-
-
-        return response()->json([
-            'shippingMethod'=>new ShippingMethodResource($shippingMethod),
+            'shippingMethods' => ShippingMethodResource::collection($shippingMethods),
         ]);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Create a new shipping method.
      *
+     * @param ShippingMethodRequest $request
+     * @return ShippingMethodResource
+     */
+    public function create(ShippingMethodRequest $request): ShippingMethodResource
+    {
+        $validatedData = $request->validated();
+        $shippingMethod = ShippingMethod::create($validatedData);
+        $shippingMethod->addImage($request, $shippingMethod);
+
+        return new ShippingMethodResource($shippingMethod);
+    }
+
+    /**
+     * Display the specified shipping method.
+     *
+     * @param int $id
+     * @return JsonResponse|ShippingMethodResource
+     */
+    public function show(int $id): JsonResponse|ShippingMethodResource
+    {
+        try {
+            $shippingMethod = ShippingMethod::findOrFail($id);
+            return new ShippingMethodResource($shippingMethod);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Shipping method not found'], 404);
+        }
+    }
+
+    /**
+     * Update the specified shipping method.
+     *
+     * @param ShippingMethodRequest $request
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function update(ShippingMethodRequest $request, $id): JsonResponse
+    {
+        try {
+            $shippingMethod = ShippingMethod::findOrFail($id);
+
+            // Use the authorize method for authorization checks
+            //$this->authorize('update', $shippingMethod);
+
+            $validatedData = $request->validated();
+            $shippingMethod->update($validatedData);
+            $shippingMethod->updatedImageIfExist($request, $shippingMethod);
+
+            return response()->json([
+                'shippingMethod' => new ShippingMethodResource($shippingMethod),
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Shipping method not found'], 404);
+        }
+    }
+
+    /**
+     * Remove the specified shipping method.
+     *
+     * @param Request $request
      * @param int $id
      * @return JsonResponse
      */
     public function delete(Request $request, int $id): JsonResponse
     {
+        try {
+            $shippingMethod = ShippingMethod::findOrFail($id);
 
-        //
-        $shippingMethod=ShippingMethod::find($id);
-        //$this->authorize('delete', $category);
+            // Use the authorize method for authorization checks
+            //$this->authorize('delete', $shippingMethod);
 
-        $shippingMethod->deletedImageIfExist($request,$shippingMethod);
+            $shippingMethod->deletedImageIfExist($request, $shippingMethod);
+            $shippingMethod->delete();
 
-        $shippingMethod->delete();
-
-        return response()->json([
-            'message'=>$shippingMethod->name.'deleted',
-        ]);
+            return response()->json([
+                'message' => $shippingMethod->name . ' deleted successfully',
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['error' => 'Shipping method not found'], 404);
+        }
     }
 }

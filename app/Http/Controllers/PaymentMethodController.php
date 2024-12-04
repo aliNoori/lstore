@@ -2,115 +2,90 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Requests\PaymentMethodRequest;
 use App\Http\Resources\PaymentMethodResource;
-
 use App\Models\PaymentMethod;
-
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
 
 class PaymentMethodController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * لیست تمامی روش‌های پرداخت را برمی‌گرداند.
      */
-    //TODO:test git and deploy to server>>set permission for user matin
-
-
     public function list(): JsonResponse
     {
-        //
-        $paymentMethods=PaymentMethod::all();
+        $paymentMethods = PaymentMethod::all();
         return response()->json([
-            'paymentMethods'=>PaymentMethodResource::collection($paymentMethods)]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(PaymentMethodRequest $request): PaymentMethodResource
-    {
-        //
-        //
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
-
-        $paymentMethod=PaymentMethod::create($validatedData);
-
-        $paymentMethod->addimage($request,$paymentMethod);
-
-        return new PaymentMethodResource($paymentMethod);
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return PaymentMethodResource
-     */
-    public function show($id): PaymentMethodResource
-    {
-        //
-        $shippingMethod=PaymentMethod::find($id);
-
-        //$this->authorize('view', $category);
-        return new PaymentMethodResource($shippingMethod);
-    }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  PaymentMethodRequest  $request
-     * @param  int  $id
-     * @return JsonResponse
-     */
-    public function update(PaymentMethodRequest $request, $id): JsonResponse
-    {
-        //
-        //
-        $paymentMethod=PaymentMethod::find($id);
-
-        // این کد متد 'update' را در UserProduct فراخوانی می‌کند
-        //$this->authorize('update', $category);
-
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
-
-        $paymentMethod->update($validatedData);
-
-        $paymentMethod->updatedImageIfExist($request,$paymentMethod);
-
-        // دوباره بارگیری کردن مدل از دیتابیس برای به‌روزرسانی اطلاعات
-        $paymentMethod->refresh();
-
-
-        return response()->json([
-            'paymentMethod'=>new PaymentMethodResource($paymentMethod),
+            'paymentMethods' => PaymentMethodResource::collection($paymentMethods),
         ]);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return JsonResponse
+     * ایجاد یک روش پرداخت جدید.
      */
-    public function delete(Request $request, int $id): JsonResponse
+    public function create(PaymentMethodRequest $request): PaymentMethodResource
     {
+        // دریافت داده‌های معتبر
+        $validatedData = $request->validated();
 
-        //
-        $paymentMethod=PaymentMethod::find($id);
-        //$this->authorize('delete', $category);
+        // ایجاد روش پرداخت
+        $paymentMethod = PaymentMethod::create($validatedData);
 
-        $paymentMethod->deletedImageIfExist($request,$paymentMethod);
+        // افزودن تصویر (در صورت وجود)
+        $paymentMethod->addImage($request, $paymentMethod);
 
+        return new PaymentMethodResource($paymentMethod);
+    }
+
+    /**
+     * نمایش جزئیات یک روش پرداخت خاص.
+     */
+    public function show(int $id): PaymentMethodResource
+    {
+        $paymentMethod = PaymentMethod::findOrFail($id);
+        return new PaymentMethodResource($paymentMethod);
+    }
+
+    /**
+     * به‌روزرسانی یک روش پرداخت.
+     */
+    public function update(PaymentMethodRequest $request, int $id): JsonResponse
+    {
+        $paymentMethod = PaymentMethod::findOrFail($id);
+
+        // دریافت داده‌های معتبر
+        $validatedData = $request->validated();
+
+        // به‌روزرسانی روش پرداخت
+        $paymentMethod->update($validatedData);
+
+        // به‌روزرسانی تصویر (در صورت وجود)
+        $paymentMethod->updatedImageIfExist($request, $paymentMethod);
+
+        // بارگذاری مجدد مدل
+        $paymentMethod->refresh();
+
+        return response()->json([
+            'paymentMethod' => new PaymentMethodResource($paymentMethod),
+        ]);
+    }
+
+    /**
+     * حذف یک روش پرداخت.
+     */
+    public function delete(int $id): JsonResponse
+    {
+        $paymentMethod = PaymentMethod::findOrFail($id);
+
+        // حذف تصویر مرتبط (در صورت وجود)
+        $paymentMethod->deletedImageIfExist();
+
+        // حذف روش پرداخت
         $paymentMethod->delete();
 
         return response()->json([
-            'message'=>$paymentMethod->name.'deleted',
+            'message' => $paymentMethod->name . ' deleted',
         ]);
     }
 }

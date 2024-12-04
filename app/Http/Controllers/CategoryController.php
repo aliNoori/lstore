@@ -3,108 +3,172 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CategoryRequest;
-use App\Http\Resources\CartResource;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class CategoryController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * نمایش لیست دسته‌بندی‌ها
      *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
+     * @return AnonymousResourceCollection|JsonResponse
      */
-    public function index()
+    public function index(): AnonymousResourceCollection|JsonResponse
     {
-        //
-        $categories=Category::all();
-        return CategoryResource::collection($categories);
+        try {
+            // دریافت تمامی دسته‌بندی‌ها
+            $categories = Category::all();
+            return CategoryResource::collection($categories);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت دسته‌بندی‌ها',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Show the form for creating a new resource.
+     * ایجاد دسته‌بندی جدید
      *
-     * @return CategoryResource
+     * @param CategoryRequest $request
+     * @return JsonResponse
      */
-    public function create(CategoryRequest $request)
+    public function create(CategoryRequest $request): JsonResponse
     {
-        //
-        //
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
+        try {
+            // دریافت داده‌های معتبر
+            $validatedData = $request->validated();
 
-        $category=Category::create($validatedData);
+            // ایجاد دسته‌بندی
+            $category = Category::create($validatedData);
 
-        $category->addimage($request,$category);
+            // اضافه کردن تصویر به دسته‌بندی
+            $category->addImage($request, $category);
 
-        return new CategoryResource($category);
-
+            return response()->json([
+                'success' => true,
+                'category' => new CategoryResource($category)
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در ایجاد دسته‌بندی',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Display the specified resource.
+     * نمایش جزئیات دسته‌بندی
      *
-     * @param  int  $id
-     * @return CategoryResource
+     * @param int $id شناسه دسته‌بندی
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        //
-        $category=Category::find($id);
+        try {
+            $category = Category::find($id);
 
-        //$this->authorize('view', $category);
-        return new CategoryResource($category);
-    }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(CategoryRequest $request, $id)
-    {
-        //
-        //
-        $category=Category::find($id);
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'دسته‌بندی مورد نظر یافت نشد'
+                ], 404);
+            }
 
-        // این کد متد 'update' را در UserProduct فراخوانی می‌کند
-        //$this->authorize('update', $category);
-
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
-
-        $category->update($validatedData);
-
-        $category->updatedImageIfExist($request,$category);
-
-        // دوباره بارگیری کردن مدل از دیتابیس برای به‌روزرسانی اطلاعات
-        $category->refresh();
-
-
-        return response()->json([
-            'category'=>new CategoryResource($category),
-        ]);
+            return response()->json([
+                'success' => true,
+                'category' => new CategoryResource($category)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در دریافت اطلاعات دسته‌بندی',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * به‌روزرسانی دسته‌بندی
      *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
+     * @param CategoryRequest $request
+     * @param int $id شناسه دسته‌بندی
+     * @return JsonResponse
      */
-    public function delete(CategoryRequest $request, int $id): \Illuminate\Http\JsonResponse
+    public function update(CategoryRequest $request, int $id): JsonResponse
     {
-        //
-        //
-        //
-        $category=Category::find($id);
-        //$this->authorize('delete', $category);
-        $category->delete();
-        $category->deletedImageIfExist($request,$category);
-        return response()->json([
-            'message'=>$category->name.'deleted',
-        ]);
+        try {
+            $category = Category::find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'دسته‌بندی مورد نظر یافت نشد'
+                ], 404);
+            }
+
+            // به‌روزرسانی داده‌ها
+            $validatedData = $request->validated();
+            $category->update($validatedData);
+
+            // به‌روزرسانی تصویر در صورت وجود
+            $category->updatedImageIfExist($request, $category);
+
+            // بارگذاری دوباره مدل
+            $category->refresh();
+
+            return response()->json([
+                'success' => true,
+                'category' => new CategoryResource($category)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در به‌روزرسانی دسته‌بندی',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * حذف دسته‌بندی
+     *
+     * @param CategoryRequest $request
+     * @param int $id شناسه دسته‌بندی
+     * @return JsonResponse
+     */
+    public function delete(CategoryRequest $request, int $id): JsonResponse
+    {
+        try {
+            $category = Category::find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'دسته‌بندی مورد نظر یافت نشد'
+                ], 404);
+            }
+
+            // حذف دسته‌بندی
+            $category->delete();
+
+            // حذف تصویر در صورت وجود
+            $category->deletedImageIfExist($request, $category);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'دسته‌بندی با موفقیت حذف شد'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'خطا در حذف دسته‌بندی',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

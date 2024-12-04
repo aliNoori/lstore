@@ -2,180 +2,125 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Http\Requests\PaymentGatewayRequest;
 use App\Http\Requests\PaymentMethodRequest;
 use App\Http\Resources\PaymentGatewayResource;
 use App\Http\Resources\PaymentMethodResource;
-
 use App\Models\PaymentGateway;
 use App\Models\PaymentMethod;
-
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-
 
 class PaymentGatewayController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * لیست تمام درگاه‌های پرداخت را برمی‌گرداند.
      */
     public function list(): JsonResponse
     {
-        //
-        $paymentGateways=PaymentGateway::all();
+        $paymentGateways = PaymentGateway::all();
         return response()->json([
-            'onlinePaymentMethods'=>PaymentGatewayResource::collection($paymentGateways)]);
+            'onlinePaymentMethods' => PaymentGatewayResource::collection($paymentGateways),
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * ایجاد یک درگاه پرداخت جدید.
      */
     public function create(PaymentGatewayRequest $request): PaymentGatewayResource
     {
-        //
-        //
-        // دریافت داده‌های معتبر
-        $validatedData = $request->all();
+        // دریافت داده‌های معتبر از درخواست
+        $validatedData = $request->validated();
 
-        $paymentGateway=PaymentGateway::create($validatedData);
+        // ایجاد درگاه پرداخت
+        $paymentGateway = PaymentGateway::create($validatedData);
 
-        $paymentGateway->addimage($request,$paymentGateway);
+        // افزودن تصویر (در صورت وجود)
+        $paymentGateway->addImage($request, $paymentGateway);
 
         return new PaymentGatewayResource($paymentGateway);
-
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return PaymentGatewayResource
+     * نمایش جزئیات یک درگاه پرداخت خاص.
      */
-    public function show($id): PaymentGatewayResource
+    public function show(int $id): PaymentGatewayResource
     {
-        //
-        $paymentGateway=PaymentGateway::find($id);
-
-        //$this->authorize('view', $category);
+        $paymentGateway = PaymentGateway::findOrFail($id);
         return new PaymentGatewayResource($paymentGateway);
     }
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  PaymentMethodRequest  $request
-     * @param  int  $id
-     * @return JsonResponse
-     */
-    public function update(PaymentGatewayRequest $request, $id): JsonResponse
-    {
-        //
-        //
-        $paymentGateway=PaymentGateway::find($id);
 
-        // این کد متد 'update' را در UserProduct فراخوانی می‌کند
-        //$this->authorize('update', $category);
+    /**
+     * به‌روزرسانی یک درگاه پرداخت.
+     */
+    public function update(PaymentGatewayRequest $request, int $id): JsonResponse
+    {
+        $paymentGateway = PaymentGateway::findOrFail($id);
 
         // دریافت داده‌های معتبر
-        $validatedData = $request->all();
+        $validatedData = $request->validated();
 
+        // به‌روزرسانی اطلاعات درگاه پرداخت
         $paymentGateway->update($validatedData);
 
-        $paymentGateway->updatedImageIfExist($request,$paymentGateway);
+        // به‌روزرسانی تصویر در صورت وجود
+        $paymentGateway->updatedImageIfExist($request, $paymentGateway);
 
-        // دوباره بارگیری کردن مدل از دیتابیس برای به‌روزرسانی اطلاعات
+        // بارگذاری مجدد مدل
         $paymentGateway->refresh();
 
-
         return response()->json([
-            'paymentGateway'=>new PaymentGatewayResource($paymentGateway),
+            'paymentGateway' => new PaymentGatewayResource($paymentGateway),
         ]);
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return JsonResponse
+     * حذف یک درگاه پرداخت.
      */
-    public function delete(Request $request, int $id): JsonResponse
+    public function delete(int $id): JsonResponse
     {
+        $paymentGateway = PaymentGateway::findOrFail($id);
 
-        //
-        $paymentGateway=PaymentGateway::find($id);
-        //$this->authorize('delete', $category);
+        // حذف تصویر مرتبط (در صورت وجود)
+        $paymentGateway->deletedImageIfExist();
 
-        $paymentGateway->deletedImageIfExist($request,$paymentGateway);
-
+        // حذف درگاه پرداخت
         $paymentGateway->delete();
 
         return response()->json([
-            'message'=>$paymentGateway->type.'deleted',
+            'message' => $paymentGateway->type . ' deleted',
         ]);
     }
-    public function manageGateway($id)
+
+    /**
+     * مدیریت روش پرداخت بر اساس نوع.
+     */
+    public function manageGateway(int $id): JsonResponse
     {
-        // پیدا کردن متد پرداخت بر اساس شناسه
         $paymentMethod = PaymentMethod::find($id);
 
-        // چک کردن اینکه آیا متد پرداخت وجود دارد
         if (!$paymentMethod) {
             return response()->json([
                 'success' => false,
-                'message' => 'Payment method not found.'
+                'message' => 'Payment method not found.',
             ], 404);
         }
 
         // بررسی نوع متد پرداخت
-        switch ($paymentMethod->type) {
-            case 'credit_card':
-                // عملیات مربوط به کارت اعتباری
-                $action = "Processing credit card payment";
-                break;
+        $action = match ($paymentMethod->type) {
+            'credit_card' => 'Processing credit card payment',
+            'paypal' => 'Processing PayPal payment',
+            'Online' => 'Processing online payment',
+            'Offline' => 'Processing offline payment',
+            'Wallet' => 'Processing wallet payment',
+            'bank_transfer' => 'Processing bank transfer payment',
+            'cash_on_delivery' => 'Processing cash on delivery',
+            default => 'Unknown payment method',
+        };
 
-            case 'paypal':
-                // عملیات مربوط به پی‌پال
-                $action = "Processing PayPal payment";
-                break;
-
-            case 'Online':
-                // عملیات مربوط به پرداخت آنلاین
-                $action = "Online";
-                // مثال اضافه برای افزودن قابلیت خاص مانند ادغام دروازه پرداخت
-                //$gateway = PaymentGateway::where('type', 'online')->first();
-                //$action .= " with gateway: " . ($gateway ? $gateway->gateway : "No gateway available");
-                break;
-
-            case 'Offline':
-                // عملیات مربوط به پرداخت آفلاین
-                $action = "Processing Offline payment";
-                break;
-
-            case 'Wallet':
-                // عملیات مربوط به کیف پول
-                $action = "Processing wallet payment";
-                break;
-
-            case 'bank_transfer':
-                // عملیات مربوط به انتقال بانکی
-                $action = "Processing bank transfer payment";
-                break;
-
-            case 'cash_on_delivery':
-                // عملیات مربوط به پرداخت در محل
-                $action = "Processing cash on delivery";
-                break;
-
-            default:
-                $action = "Unknown payment method";
-                break;
-        }
-
-        // بازگرداندن نتیجه
         return response()->json([
             'success' => true,
-            'action' => $action
-        ], 200);
+            'action' => $action,
+        ]);
     }
-
 }
