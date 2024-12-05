@@ -60,7 +60,9 @@ class UserController extends Controller
         $token = $user->createToken('authToken', ['read', 'write'])->plainTextToken;
 
         // ارسال ایمیل ثبت‌نام
-        Mail::to($user->email)->queue(new RegisterUserMail($user))->onQueue('Emails');
+        $mail = (new RegisterUserMail($user))->onQueue('Emails');
+        Mail::to($user->email)->queue($mail);
+
 
         return response()->json([
             'user' => new UserResource($user),
