@@ -8,6 +8,7 @@ use App\Jobs\ApplyCoupon;
 use App\Jobs\ChargeWallet;
 use App\Jobs\HandleHighValueOrder;
 use App\Jobs\SendPaymentNotification;
+use App\Mail\TransactionMail;
 use App\Models\Order;
 use App\Models\Transaction;
 use Carbon\Carbon;
@@ -15,6 +16,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Facades\PaymentGateway;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Redirect;
 
 class PaymentController extends Controller
@@ -109,6 +111,8 @@ class PaymentController extends Controller
 
         // کاربر مرتبط با سفارش
         $user = $order->user;
+
+        Mail::to($user->email)->send(new TransactionMail($user, $transaction));
 
         // ساخت پارامترهای بازگشت
         $query_params = $error_message ? ['error' => $error_message] : [];
