@@ -112,7 +112,8 @@ class PaymentController extends Controller
         // کاربر مرتبط با سفارش
         $user = $order->user;
 
-        Mail::to($user->email)->queue(new TransactionMail($user, $transaction))->onQueue('Emails');
+        $mail = (new TransactionMail($user, $transaction))->onQueue('Emails');
+        Mail::to($user->email)->queue($mail);
 
         // ساخت پارامترهای بازگشت
         $query_params = $error_message ? ['error' => $error_message] : [];
