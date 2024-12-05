@@ -12,11 +12,13 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\ScoreResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\WalletResource;
+use App\Mail\RegisterUserMail;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -57,9 +59,13 @@ class UserController extends Controller
         // Token created for user
         $token = $user->createToken('authToken', ['read', 'write'])->plainTextToken;
 
+        // ارسال ایمیل ثبت‌نام
+        Mail::to($user->email)->send(new RegisterUserMail($user));
+
         return response()->json([
             'user' => new UserResource($user),
             'token' => $token,
+            'message' => 'ثبت‌نام با موفقیت انجام شد و ایمیل ارسال شد.',
         ]);
     }
 
