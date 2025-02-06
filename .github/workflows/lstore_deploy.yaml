@@ -22,9 +22,9 @@ jobs:
           sudo chown -R www-data:www-data /var/www/store/public_html/lstore
       - name: Run migrations
         run: |
-          #cd /var/www/store/public_html/lstore
-          #php artisan migrate --force
-          #php artisan db:seed --force
+          cd /var/www/store/public_html/lstore
+          php artisan migrate --force
+          php artisan db:seed --force
       - name: Cache configuration
         run: |
           cd /var/www/store/public_html/lstore
