@@ -55,7 +55,7 @@ return [
 
             'root' => env('STORE_FILE_SERVER_ROOT'),
 
-            'url' => 'http://192.168.1.105/uploads/images', // آدرس وب سرور
+            'url' => 'http://185.204.197.237/uploads/images', // آدرس وب سرور
             // 'passive'  => true,
             // 'ssl'      => true,
              'timeout'  => 30,
