@@ -15,7 +15,7 @@ class CategoryController extends Controller
      *
      * @return AnonymousResourceCollection|JsonResponse
      */
-    public function index(): AnonymousResourceCollection|JsonResponse
+    public function list(): AnonymousResourceCollection|JsonResponse
     {
         try {
             // دریافت تمامی دسته‌بندی‌ها
