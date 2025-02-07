@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Storage;
 trait ImageManager
 {
     // متدهای مدیریت تصویر
-    public function addImage(Request $request,$model): void
+    public function addImage(Request $request, $model): void
     {
 
         if ($request->hasFile('image')) {
@@ -28,10 +28,9 @@ trait ImageManager
             // ذخیره فایل در FTP
             $filePath = '/uploads/images/' . $newFileName;
             $disk = 'sftp'; // دیسک مورد استفاده (باید در config/filesystems.php تعریف شود)
-            $result=Storage::putFileAs('uploads/images', $fileData, $newFileName);
+            $result = Storage::putFileAs('uploads/images', $fileData, $newFileName);
 
             Log::info('File upload result:', ['path' => $result]);
-
 
 
             $file = new File([
@@ -45,27 +44,26 @@ trait ImageManager
             $model->image()->save($file);
         }
     }
-    public function deletedImageIfExist(Request $request, $model): void
+
+    public function deletedImageIfExist($model): void
     {
-        if ($request->hasFile('image')) {
-        if ($model->image) {
+            if ($model->image) {
 
-            $disk = 'sftp'; // دیسک FTP
-            Log::info('test');
-            Log::info('$model->image->file_path', [Storage::path($model->image->file_path)]);
+                $disk = 'sftp'; // دیسک FTP
+                Log::info('test');
+                Log::info('$model->image->file_path', [Storage::path($model->image->file_path)]);
 
-            // حذف فایل از FTP
-            if (Storage::exists($model->image->file_path)) {
-                Storage::delete($model->image->file_path);
+                // حذف فایل از FTP
+                if (Storage::exists($model->image->file_path)) {
+                    Storage::delete($model->image->file_path);
+                }
+                /* // حذف فایل از سیستم
+                 if (file_exists(public_path( $model->image->file_path))) {
+                     unlink(public_path( $model->image->file_path));
+                 }*/
+                // حذف رکورد فایل از دیتابیس
+                $model->image->delete();
             }
-           /* // حذف فایل از سیستم
-            if (file_exists(public_path( $model->image->file_path))) {
-                unlink(public_path( $model->image->file_path));
-            }*/
-            // حذف رکورد فایل از دیتابیس
-            $model->image->delete();
-        }
-        }
     }
 
     /**
