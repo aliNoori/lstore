@@ -23,7 +23,7 @@ class ProductRequest extends FormRequest
      *
      * @return array<string, mixed>
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'sku'=>'required|unique:products|string|max:255',
@@ -32,6 +32,7 @@ class ProductRequest extends FormRequest
             'price' => 'required|numeric|min:0',
             'discount' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
+            'category_id'=>'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048', // برای اعتبارسنجی فایل تصویری
         ];
     }
