@@ -9,6 +9,7 @@ use App\Models\Like;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\View;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -94,18 +95,19 @@ class ProductController extends Controller
     /**
      * Delete a product.
      *
-     * @param ProductRequest $request
      * @param int $id
      * @return JsonResponse
+     * @throws AuthorizationException
      */
-    public function delete(ProductRequest $request, int $id): JsonResponse
+    public function delete(int $id): JsonResponse
     {
         try {
             $product = Product::findOrFail($id);
             $this->authorize('delete', $product);
 
+            $product->deletedImageIfExist($product);
             $product->delete();
-            $product->deletedImageIfExist($request, $product);
+
 
             return response()->json(['message' => "{$product->name} deleted successfully"]);
         } catch (ModelNotFoundException $e) {
