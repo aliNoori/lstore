@@ -121,7 +121,7 @@ use \App\Http\Controllers\CategoryController;
 Route::group(['prefix' => 'category'], function () {
 
     Route::middleware(['auth:sanctum'/*, 'has.permission', 'has.role'*/])->group(function () {
-
+        Route::get('/list',[CategoryController::class, 'list']);
         Route::post('/create', [CategoryController::class, 'create']);
         Route::get('/show/{id}', [CategoryController::class, 'show']);
         Route::post('/update/{id}', [CategoryController::class, 'update']);
