@@ -12,6 +12,7 @@ use App\Http\Resources\OrderResource;
 use App\Http\Resources\ScoreResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\WalletResource;
+use App\Jobs\AddScore;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
@@ -56,6 +57,9 @@ class UserController extends Controller
 
         // Token created for user
         $token = $user->createToken('authToken', ['read', 'write'])->plainTextToken;
+        // امتیاز پایه
+        AddScore::dispatch($user->id, 10, 'Base Score', 'Initial base score for the payment')->onQueue('AddScore');
+
 
         return response()->json([
             'user' => new UserResource($user),
