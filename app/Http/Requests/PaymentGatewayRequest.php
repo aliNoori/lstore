@@ -47,6 +47,7 @@ class PaymentGatewayRequest extends FormRequest
             'wsdl_confirm' => 'nullable|url|max:255', // آدرس تایید WSDL اختیاری با محدودیت 255 کاراکتر
             'wsdl_reverse' => 'nullable|url|max:255', // آدرس برگشت WSDL اختیاری با محدودیت 255 کاراکتر
             'wsdl_multiplexed' => 'nullable|url|max:255', // آدرس WSDL برای پرداخت‌های چندگانه
+            'payment_gateway'=>'nullable|url|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // فایل تصویری اختیاری با حداکثر 2 مگابایت
         ];
     }
