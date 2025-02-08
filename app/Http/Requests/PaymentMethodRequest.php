@@ -32,6 +32,7 @@ class PaymentMethodRequest extends FormRequest
             Rule::unique('payment_methods')->ignore($payment_methods_Id), // نادیده گرفتن ایمیل کاربر فعلی در صورت ویرایش
             'description' => 'nullable|string|max:1000', // توضیحات اختیاری
             'is_active' => 'boolean', // وضعیت فعال بودن باید مقدار صحیح/نادرست داشته باشد
+            'type'=>'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // اعتبارسنجی فایل تصویری
         ];
     }
