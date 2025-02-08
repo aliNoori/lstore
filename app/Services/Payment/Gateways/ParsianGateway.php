@@ -15,7 +15,7 @@ class ParsianGateway implements PaymentGatewayInterface
 
     public function __construct()
     {
-        $this->terminalId = 'UHdf9J1D4QweieQOqVZT';
+        $this->terminalId = 'XGZ7hN6IcDieZ3bwXFAX';
         $this->wsdl = 'https://sandbox.banktest.ir/parsian/pec.shaparak.ir/NewIPGServices/Sale/SaleService.asmx?wsdl';
         $this->paymentGateway = 'https://sandbox.banktest.ir/parsian/pec.shaparak.ir/NewIPG';
     }

@@ -22,8 +22,8 @@ class PaymentController extends Controller
     /**
      * آدرس بازگشت (Callback URL) برای سیستم پرداخت
      */
-    private string $CALL_BACK_URL = 'http://192.168.1.105/api/callback/payment';
-
+    //private string $CALL_BACK_URL = 'http://192.168.1.105/api/callback/payment';
+    private string $CALL_BACK_URL = 'http://185.204.197.237/store/api/callback/payment';
     /**
      * پردازش درخواست پرداخت
      *
@@ -116,7 +116,8 @@ class PaymentController extends Controller
         $query_params['auth_token'] = $user->createToken('UserToken')->plainTextToken;
 
         // ساخت لینک بازگشت به کلاینت
-        $url = 'http://192.168.1.101/your-transaction-receive';
+        //$url = 'http://192.168.1.101/your-transaction-receive';
+        $url = 'http://185.204.197.237/your-transaction-receive';
         $redirect_url = $url . '?' . http_build_query($query_params);
 
         return Redirect::to($redirect_url);
