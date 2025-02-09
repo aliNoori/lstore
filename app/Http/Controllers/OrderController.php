@@ -16,7 +16,7 @@ class OrderController extends Controller
     {
         $user = $request->user();
 
-        $orders = $user->orders()->with('orderDetails.product')->get();
+        $orders = $user->orders()->with('orderDetails.product.file')->get();
 
         return response()->json([
             'success' => true,
@@ -99,7 +99,7 @@ class OrderController extends Controller
     // مشاهده جزئیات سفارش
     public function showOrder(Request $request,$id): JsonResponse
     {
-        $order = Order::with('orderDetails.product')->find($id);
+        $order = Order::with('orderDetails.product.file')->find($id);
 
         if (!$order) {
             return response()->json([
