@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\Address;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
     // نمایش لیست سفارشات کاربر
-    public function myOrders(Request $request): \Illuminate\Http\JsonResponse
+    public function myOrders(Request $request): JsonResponse
     {
         $user = $request->user();
 
@@ -23,7 +24,7 @@ class OrderController extends Controller
     }
 
     // ایجاد سفارش جدید
-    public function createOrder(Request $request, $addressId): \Illuminate\Http\JsonResponse
+    public function createOrder(Request $request, $addressId): JsonResponse
     {
         try {
             $user = $request->user();
@@ -95,9 +96,11 @@ class OrderController extends Controller
     }
 
     // مشاهده جزئیات سفارش
-    public function showOrder($id): \Illuminate\Http\JsonResponse
+    public function showOrder(Request $request,$id): JsonResponse
     {
-        $order = Order::with('orderDetails.product')->find($id);
+        //$order = Order::with('orderDetails.product')->find($id);
+        $user = $request->user();
+        $order=$user->orders()->with('orderDetails.product')->find($id);
 
         if (!$order) {
             return response()->json([
@@ -113,7 +116,7 @@ class OrderController extends Controller
     }
 
     // به‌روزرسانی وضعیت سفارش
-    public function updateOrderStatus(Request $request, $id): \Illuminate\Http\JsonResponse
+    public function updateOrderStatus(Request $request, $id): JsonResponse
     {
         $order = Order::find($id);
 
@@ -144,7 +147,7 @@ class OrderController extends Controller
     }
 
     // حذف سفارش
-    public function deleteOrder($id): \Illuminate\Http\JsonResponse
+    public function deleteOrder($id): JsonResponse
     {
         $order = Order::find($id);
 
@@ -164,7 +167,7 @@ class OrderController extends Controller
     }
 
     // افزودن روش ارسال به سفارش
-    public function addShippingToOrder($shippingId, $orderNumber): \Illuminate\Http\JsonResponse
+    public function addShippingToOrder($shippingId, $orderNumber): JsonResponse
     {
         $order = Order::where('order_number', $orderNumber)->first();
 
