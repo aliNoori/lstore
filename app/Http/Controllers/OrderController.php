@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Address;
 use Illuminate\Http\JsonResponse;
@@ -98,9 +99,7 @@ class OrderController extends Controller
     // مشاهده جزئیات سفارش
     public function showOrder(Request $request,$id): JsonResponse
     {
-        //$order = Order::with('orderDetails.product')->find($id);
-        $user = $request->user();
-        $order=$user->orders()->with('orderDetails.product')->find($id);
+        $order = Order::with('orderDetails.product')->find($id);
 
         if (!$order) {
             return response()->json([
@@ -111,7 +110,7 @@ class OrderController extends Controller
 
         return response()->json([
             'success' => true,
-            'order' => $order,
+            'order' => new OrderResource($order),
         ]);
     }
 
