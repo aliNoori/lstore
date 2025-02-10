@@ -25,6 +25,8 @@ class CouponResource extends JsonResource
             'discount_type'=>$this->discount_type,
             'is_used'=>$this->is_used,
             'description'=>$this->description,
+            'created_at'=>$this->created_at,
+            'updated_at'=>$this->updated_at,
 
         ];
     }

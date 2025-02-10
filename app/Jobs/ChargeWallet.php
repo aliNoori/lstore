@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Exception;
 
@@ -54,13 +55,36 @@ class ChargeWallet implements ShouldQueue
             $wallet = Wallet::firstOrCreate(['user_id' => $user->id]);
             Log::info("Wallet status: " . json_encode($wallet->toArray()));
 
+            DB::beginTransaction();
+            try {
+                // محاسبه ۱۰٪ مبلغ
+                $amountToAdd = bcmul($this->amount, '0.10', 2);
 
-            // محاسبه ۱۰٪ مبلغ
-            $amountToAdd = bcmul($this->amount, '0.10', 2);
+                // ایجاد تراکنش جدید (ابتدا در وضعیت pending)
+                $transaction = $wallet->transactions()->create([
+                    'amount' => $amountToAdd,
+                    'transaction_type' => 'deposit',
+                    'status' => 'pending',
+                ]);
 
-            // افزایش موجودی کیف پول
-            $wallet->balance = bcadd($wallet->balance, $amountToAdd, 2);
-            $wallet->save();
+                // افزایش موجودی کیف پول
+                $wallet->balance = bcadd($wallet->balance, $amountToAdd, 2);
+                $wallet->save();
+
+                // بروزرسانی وضعیت تراکنش به completed
+                $transaction->update(['status' => 'completed']);
+
+                DB::commit();
+            } catch (\Exception $e) {
+                DB::rollBack();
+
+                // اگر خطایی رخ دهد، تراکنش را failed می‌کنیم
+                if (isset($transaction)) {
+                    $transaction->update(['status' => 'failed']);
+                }
+
+                throw $e; // ارسال خطا برای بررسی
+            }
 
             $variables = [
                 'user_name' => $user->name,

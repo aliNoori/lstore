@@ -30,6 +30,9 @@ class InvoiceResource extends JsonResource
             'shipping_cost'=>$this->shipping_cost,
             'total_amount'=>$this->total_amount,
             'items'=>InvoiceItemResource::collection($this->items),
+            'created_at'=>$this->created_at,
+            'updated_at'=>$this->updated_at,
+
         ];
     }
 }
