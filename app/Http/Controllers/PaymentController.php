@@ -133,25 +133,25 @@ class PaymentController extends Controller
     private function handleRewardsAndNotifications(Order $order, Request $request): void
     {
         // امتیاز پایه
-        AddScore::dispatch($order->user_id, 10, 'Base Score', 'Initial base score for the payment')->onQueue('AddScore');
+        AddScore::dispatch($order->user_id, 10, 'امتیاز پایه', 'امتیاز پایه اولیه برای پرداخت')->onQueue('AddScore');
 
         // بررسی مشتری جدید و ثبت امتیاز و هدیه
         if (!Order::where('user_id', $order->user_id)->where('id', '!=', $order->id)->exists()) {
-            AddScore::dispatch($order->user_id, 50, 'First Order', 'Bonus for the first order')->onQueue('AddScore');
+            AddScore::dispatch($order->user_id, 50, 'اولین سفارش', 'پاداش برای اولین سفارش')->onQueue('AddScore');
             AddGiftToUser::dispatch($order->id)->onQueue('AddGiftToUser');
         }
 
         // بررسی سفارش‌های با ارزش بالا
         $swAmount = floatval(str_replace(',', '', $request->input('SwAmount')));
         if ($swAmount > 1000) {
-            AddScore::dispatch($order->user_id, 20, 'High Value Order', 'Bonus for order amount greater than 1000')->onQueue('AddScore');
+            AddScore::dispatch($order->user_id, 20, 'سفارش با ارزش بالا', 'پاداش برای مبلغ سفارش بیشتر از 100000')->onQueue('AddScore');
             HandleHighValueOrder::dispatch($order->id)->onQueue('HandleHighValueOrder');
         }
 
         // بررسی روزهای خاص
         $today = Carbon::today();
         if ($today->month == 11 && $today->day == 1) {
-            AddScore::dispatch($order->user_id, 100, 'Special Day', 'Bonus for Christmas')->onQueue('AddScore');
+            AddScore::dispatch($order->user_id, 100, 'روز مخصوص', 'پاداش برای نوروز')->onQueue('AddScore');
             ApplyCoupon::dispatch($order->id)->onQueue('ApplyCoupon');
         }
 
