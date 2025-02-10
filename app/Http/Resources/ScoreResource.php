@@ -20,7 +20,7 @@ class ScoreResource extends JsonResource
             'id'=>$this->id,
             'user_id'=>$this->user_id,
             'score'=>$this->score,
-            'reasons'=>$this->reasons,
+            'reason'=>$this->reason,
             'description'=>$this->description,
             'created_at'=>$this->created_at
         ];
