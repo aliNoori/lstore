@@ -198,9 +198,10 @@ class CartController extends Controller
         $cartItem = $cart->cartItems()->where('product_id', $product_id)->first();
         if (!$cartItem) {
             return response()->json([
-                'success' => false,
-                'message' => 'محصول مورد نظر در سبد خرید یافت نشد'
-            ], 404);
+                'success' => true,
+                'product_id' => $product_id,
+                'quantity' => 0
+            ], 200);
         }
 
         // تعداد محصول در سبد خرید
