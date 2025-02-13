@@ -40,9 +40,23 @@ class CartController extends Controller
             $cartItem = $cart->cartItems()->where('product_id', $product->id)->first();
 
             if ($cartItem) {
+                // بررسی موجودی محصول
+                if ($cartItem->quantity + 1 > $product->stock) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'تعداد درخواستی بیشتر از موجودی محصول است'
+                    ], 400);
+                }
                 // افزایش تعداد محصول
                 $cartItem->quantity += 1;
             } else {
+                // بررسی موجودی محصول
+                if (1 > $product->stock) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'تعداد درخواستی بیشتر از موجودی محصول است'
+                    ], 400);
+                }
                 // اضافه کردن محصول جدید
                 $cartItem = new CartItem([
                     'cart_id' => $cart->id,
@@ -67,6 +81,7 @@ class CartController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * نمایش آیتم‌های سبد خرید

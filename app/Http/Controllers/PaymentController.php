@@ -150,7 +150,7 @@ class PaymentController extends Controller
 
         // بررسی روزهای خاص
         $today = Carbon::today();
-        if ($today->month == 11 && $today->day == 1) {
+        if ($today->month == 02 && $today->day == 13) {
             AddScore::dispatch($order->user_id, 100, 'روز مخصوص', 'پاداش برای نوروز')->onQueue('AddScore');
             ApplyCoupon::dispatch($order->id)->onQueue('ApplyCoupon');
         }
