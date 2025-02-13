@@ -92,8 +92,10 @@ Route::group(['prefix' => 'cart'], function () {
     Route::middleware(['auth:sanctum'/*, 'has.permission', 'has.role'*/])->group(function () {
 
         Route::get('/items/show', [CartController::class, 'itemsShow']);
+        Route::get('/items/{product_id}/info', [CartController::class, 'productInfo']);
         Route::post('/item/add/{id}', [CartController::class, 'addToCart']);
         Route::post('/item/remove/{id}', [CartController::class, 'removeFromCart']);
+
     });
 });
 
