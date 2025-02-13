@@ -108,13 +108,14 @@ class PaymentGatewayController extends Controller
 
         // بررسی نوع متد پرداخت
         $action = match ($paymentMethod->type) {
-            'credit_card' => 'Processing credit card payment',
-            'paypal' => 'Processing PayPal payment',
+            //'credit_card' => 'Processing credit card payment',
+            //'PayPal' => 'Processing PayPal payment',
             'Online' => 'Online',//'Processing online payment',
-            'Offline' => 'Offline',//Processing offline payment',
+            //'Offline' => 'Offline',//Processing offline payment',
             'Wallet' => 'Processing wallet payment',
-            'bank_transfer' => 'Processing bank transfer payment',
-            'cash_on_delivery' => 'Processing cash on delivery',
+            'OtherWays' => 'Processing other ways payment',
+            //'bank_transfer' => 'Processing bank transfer payment',
+            //'cash_on_delivery' => 'Processing cash on delivery',
             default => 'Unknown payment method',
         };
 
