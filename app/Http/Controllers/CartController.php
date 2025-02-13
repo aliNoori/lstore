@@ -180,6 +180,39 @@ class CartController extends Controller
         }
     }
 
+    protected function productInfo(Request $request, $product_id): JsonResponse
+    {
+        // دریافت کاربر لاگین شده
+        $user = $this->getUser($request);
+
+        // بررسی وجود سبد خرید
+        $cart = $user->cart()->first();
+        if (!$cart) {
+            return response()->json([
+                'success' => false,
+                'message' => 'سبد خرید یافت نشد'
+            ], 404);
+        }
+
+        // بررسی وجود محصول در سبد خرید
+        $cartItem = $cart->cartItems()->where('product_id', $product_id)->first();
+        if (!$cartItem) {
+            return response()->json([
+                'success' => false,
+                'message' => 'محصول مورد نظر در سبد خرید یافت نشد'
+            ], 404);
+        }
+
+        // تعداد محصول در سبد خرید
+        $quantity = $cartItem->quantity;
+
+        return response()->json([
+            'success' => true,
+            'product_id' => $product_id,
+            'quantity' => $quantity
+        ], 200);
+    }
+
     /**
      * دریافت کاربر لاگین شده
      *
