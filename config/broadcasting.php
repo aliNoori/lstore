@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('BROADCAST_DRIVER', 'redis'),
+    'default' => env('BROADCAST_DRIVER', 'sync'),
 
     /*
     |--------------------------------------------------------------------------
@@ -29,6 +29,9 @@ return [
     */
 
     'connections' => [
+        'sync' => [
+            'driver' => 'sync',
+        ],
         'pusher' => [
             'driver' => 'pusher',
             'key' => env('PUSHER_APP_KEY'),
