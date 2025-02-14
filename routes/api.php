@@ -67,10 +67,10 @@ use \App\Http\Controllers\ProductController;
 
 Route::group(['prefix' => 'product'], function () {
 
+    Route::get('/show/{id}', [ProductController::class, 'show']);
     Route::middleware(['auth:sanctum'/*, 'has.permission', 'has.role'*/])->group(function () {
-
         Route::post('/create', [ProductController::class, 'create']);
-        Route::get('/show/{id}', [ProductController::class, 'show']);
+        ///
         Route::post('/update/{id}', [ProductController::class, 'update']);
         Route::delete('/delete/{id}', [ProductController::class, 'delete']);
         //////////////////

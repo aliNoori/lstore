@@ -10,11 +10,16 @@ use App\Jobs\HandleHighValueOrder;
 use App\Jobs\SendPaymentNotification;
 use App\Models\Order;
 use App\Models\Transaction;
+use App\Models\Wallet;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Facades\PaymentGateway;
+//use App\Models\PaymentGateway;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 
 class PaymentController extends Controller
@@ -24,37 +29,132 @@ class PaymentController extends Controller
      */
     //private string $CALL_BACK_URL = 'http://192.168.1.105/api/callback/payment';
     private string $CALL_BACK_URL = 'http://185.204.197.237/store/api/callback/payment';
+
     /**
      * پردازش درخواست پرداخت
      *
+     * @param Request $request
      * @param string $order_number شماره سفارش
      * @param int $gateway_id شناسه درگاه پرداخت
      * @return JsonResponse
+     * @throws Exception
      */
-    public function processPayment(string $order_number, int $gateway_id): JsonResponse
+    public function processPayment(Request $request, string $order_number, int $gateway_id): JsonResponse
     {
         $callbackUrl = $this->CALL_BACK_URL;
-
-        // یافتن درگاه پرداخت موردنظر
-        $gateway = \App\Models\PaymentGateway::find($gateway_id);
-        if (!$gateway) {
-            return response()->json(['error' => 'Gateway not found'], 404);
-        }
-
+        $url = null;
         // یافتن سفارش مرتبط با شماره سفارش
         $order = Order::where('order_number', $order_number)->firstOrFail();
-
         // مقدار پرداخت از فاکتور سفارش
         $invoice = $order->invoice;
         $amount = $invoice->total_amount;
 
-        // ساخت نمونه درگاه پرداخت و دریافت URL پرداخت
-        $payment = PaymentGateway::make($gateway->gateway);
-        $url = $payment->processPayment($amount, $order->id, $callbackUrl);
+        //Check type payment
+        if ($request->paymentType === 'wallet') {
+            Log::info('paymentType');
+
+            $url = $this->processPaymentWithWallet($amount, $order_number, $gateway_id);
+
+        }
+        /*if ($request->paymentType === 'coupons') {
+
+            $url = $this->processPaymentWithCoupons($amount, $order_number, $gateway_id);
+
+        }*/
+        if ($request->paymentType === 'online') {
+
+            // یافتن درگاه پرداخت موردنظر
+            $gateway = PaymentGateway::find($gateway_id);
+            if (!$gateway) {
+                return response()->json(['error' => 'Gateway not found'], 404);
+            }
+            // ساخت نمونه درگاه پرداخت و دریافت URL پرداخت
+            $payment = PaymentGateway::make($gateway->gateway);
+            $url = $payment->processPayment($amount, $order->id, $callbackUrl);
+        }
 
         // بازگشت لینک پرداخت به فرمت JSON
         return response()->json(['url' => $url], 200, [], JSON_UNESCAPED_SLASHES);
+
     }
+
+    /**
+     * @throws Exception
+     */
+    public function processPaymentWithWallet($amount, $order_number, $id): RedirectResponse
+    {
+        // یافتن سفارش مرتبط با شماره سفارش
+        $order = Order::where('order_number', $order_number)->firstOrFail();
+        Log::info('before');
+        // شروع تراکنش
+        DB::beginTransaction();
+        Log::info('after');
+        try {
+            // یافتن کیف پول کاربر بر اساس ID
+            $wallet = Wallet::find($id);
+
+            // بررسی موجودی کیف پول
+            if ($wallet->balance < $amount) {
+                throw new Exception('موجودی کیف پول کافی نیست.');
+            }
+
+            // ایجاد یک تراکنش جدید در کیف پول
+            $transaction = new Transaction();
+            $transaction->wallet_id = $wallet->id;
+            $transaction->amount = $amount;
+            $transaction->type = 'debit'; // نوع تراکنش (مثلاً بدهی)
+            $transaction->status = 0;
+            $transaction->token = 2020;
+            $transaction->save();
+
+            // کم کردن مبلغ از موجودی کیف پول
+            $wallet->balance -= $amount;
+            $wallet->save();
+            $request = new Request([
+                'SwAmount' => $amount,
+            ]);
+            $this->handleRewardsAndNotifications($order, $request);
+            ///
+            // آماده‌سازی داده‌های تراکنش
+            $transaction_data = [
+                'order_id' => $transaction->order_id,
+                'amount' => $transaction->amount,
+                'status' => $transaction->status,
+                'token' => $transaction->token,
+            ];
+
+
+            // کاربر مرتبط با سفارش
+            $user = $order->user;
+            $error_message=null;
+            // ساخت پارامترهای بازگشت
+            $query_params = $error_message ? ['error' => $error_message] : [];
+            $query_params = array_merge($query_params, $transaction_data);
+            $query_params['auth_token'] = $user->createToken('UserToken')->plainTextToken;
+
+            // ساخت لینک بازگشت به کلاینت
+            //$url = 'http://192.168.1.101/your-transaction-receive';
+            $url = 'http://185.204.197.237/your-transaction-receive';
+            $redirect_url = $url . '?' . http_build_query($query_params);
+
+            // تایید تراکنش
+            DB::commit();
+
+            return Redirect::to($redirect_url);
+        } catch (Exception $e) {
+            // لغو تراکنش در صورت بروز خطا
+            DB::rollBack();
+
+            // نمایش پیام خطا
+            return back()->withErrors(['error' => $e->getMessage()]);
+        }
+    }
+
+    public function processPaymentWithCoupons($amount, $order_number, $id)
+    {
+
+    }
+
     /**
      * پردازش پاسخ بازگشت از درگاه پرداخت
      *
@@ -114,7 +214,7 @@ class PaymentController extends Controller
         $query_params = $error_message ? ['error' => $error_message] : [];
         $query_params = array_merge($query_params, $transaction_data ?? []);
         $query_params['auth_token'] = $user->createToken('UserToken')->plainTextToken;
-
+        Log::info('url');
         // ساخت لینک بازگشت به کلاینت
         //$url = 'http://192.168.1.101/your-transaction-receive';
         $url = 'http://185.204.197.237/your-transaction-receive';
@@ -132,6 +232,7 @@ class PaymentController extends Controller
      */
     private function handleRewardsAndNotifications(Order $order, Request $request): void
     {
+        Log::info('in queue');
         // امتیاز پایه
         AddScore::dispatch($order->user_id, 10, 'امتیاز پایه', 'امتیاز پایه اولیه برای پرداخت')->onQueue('AddScore');
 
