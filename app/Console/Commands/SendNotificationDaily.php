@@ -34,7 +34,7 @@ class SendNotificationDaily extends Command
 
         foreach ($users as $user) {
             // ارسال کاربر به صف همراه با پیام
-            SendPaymentNotification::dispatch($user, 'this message is a test for schedule')
+            SendPaymentNotification::dispatch($user, 'این یک پیام آزمایشی برای تست برنامه زمانبندی لاراول است که با سوکت ارسال می شود')
                 ->onQueue('SendPaymentNotification');
         }
 
