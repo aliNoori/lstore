@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\TransactionResource;
 use App\Jobs\AddGiftToUser;
 use App\Jobs\AddScore;
 use App\Jobs\ApplyCoupon;
@@ -10,11 +11,15 @@ use App\Jobs\HandleHighValueOrder;
 use App\Jobs\SendPaymentNotification;
 use App\Models\Order;
 use App\Models\Transaction;
+use App\Models\Wallet;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Facades\PaymentGateway;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redirect;
 
 class PaymentController extends Controller
@@ -121,6 +126,55 @@ class PaymentController extends Controller
         $redirect_url = $url . '?' . http_build_query($query_params);
 
         return Redirect::to($redirect_url);
+    }
+    public function paymentWithWallet($order_number,$wallet_id)
+    {
+        // یافتن سفارش مرتبط با شماره سفارش
+        $order = Order::where('order_number', $order_number)->firstOrFail();
+        // کاربر مرتبط با سفارش
+        $user = $order->user;
+        $invoice = $order->invoice;
+        $amount = $invoice->total_amount;
+        Log::info('before');
+        // شروع تراکنش
+        DB::beginTransaction();
+        Log::info('after');
+        try {
+            // یافتن کیف پول کاربر بر اساس ID
+            $wallet = Wallet::find($wallet_id);
+
+            // بررسی موجودی کیف پول
+            if ($wallet->balance < $amount) {
+                throw new Exception('موجودی کیف پول کافی نیست.');
+            }
+
+            // ایجاد یک تراکنش جدید در کیف پول
+            $transaction = new Transaction();
+            $transaction->wallet_id = $wallet->id;
+            $transaction->amount = $amount;
+            $transaction->transaction_type = 'payment'; // نوع تراکنش (مثلاً بدهی)
+            $transaction->status = 'complete';
+            $transaction->payment_method = 'wallet';
+            $transaction->sw_amount=$amount;
+            $transaction->save();
+
+            // کم کردن مبلغ از موجودی کیف پول
+            $wallet->balance -= $amount;
+            $wallet->save();
+
+            //$this->handleRewardsAndNotifications($order, $request);
+            ///
+            // تایید تراکنش
+            DB::commit();
+            return response()->json([
+                'transaction'=>new TransactionResource($transaction),200]);
+        } catch (Exception $e) {
+            // لغو تراکنش در صورت بروز خطا
+            DB::rollBack();
+            return response()->json([
+                'error'=>$e->getMessage(),401
+            ]);
+        }
     }
 
     /**
