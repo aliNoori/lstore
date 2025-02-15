@@ -18,6 +18,7 @@ class TransactionResource extends JsonResource
         //return parent::toArray($request);
         return [
             'id'=>$this->id,
+            'order'=>$this->order,
             'transaction_type'=>$this->transaction_type,
             'payment_method'=>$this->payment_method,
             'amount'=>$this->amount,
