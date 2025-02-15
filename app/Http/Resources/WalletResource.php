@@ -21,6 +21,7 @@ class WalletResource extends JsonResource
             'user_id'=>$this->user_id,
             'balance'=>$this->balance,
             'currency'=>$this->currency,
+            'transactions'=>$this->transactions,
             'created_at'=>$this->created_at,
             'updated_at'=>$this->updated_at,
         ];
