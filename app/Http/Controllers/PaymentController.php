@@ -151,6 +151,7 @@ class PaymentController extends Controller
             // ایجاد یک تراکنش جدید در کیف پول
             $transaction = new Transaction();
             $transaction->wallet_id = $wallet->id;
+            $transaction->order_id=$order->id;
             $transaction->amount = $amount;
             $transaction->transaction_type = 'payment'; // نوع تراکنش (مثلاً بدهی)
             $transaction->status = 'complete';
