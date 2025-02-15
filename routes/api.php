@@ -56,6 +56,7 @@ Route::group(['prefix' => 'user'], function () {
         ///gateway
         Route::post('/manageSelectedPayment/{id}',[PaymentGatewayController::class,'manageGateway']);
         Route::post('/processPayment/{order_number}/{gateway_id}',[PaymentController::class,'processPayment']);
+        Route::post('/processPayment/{order_number}/{wallet_id}/paymentWithWallet',[PaymentController::class,'paymentWithWallet']);
     });
 });
 /////////////////////////////======== Callback Payment ================////////////
