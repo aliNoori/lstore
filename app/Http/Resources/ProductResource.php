@@ -27,7 +27,8 @@ class ProductResource extends JsonResource
             'discount' => $this->discount ?? null, // در صورت نبود تخفیف، مقدار null
             'reviews' => $this->reviews ? ReviewResource::collection($this->reviews) : null, // در صورت نبود بررسی‌ها، مقدار null
             'reviewsCount'=>$this->reviews_count ??null,
-            'category'=>new CategoryResource($this->category)
+            'category'=>new CategoryResource($this->category),
+            'description'=>$this->description
         ];
     }
 }
