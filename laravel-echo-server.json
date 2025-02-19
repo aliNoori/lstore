@@ -1,5 +1,5 @@
 {
-	"authHost": "http://185.204.197.237",
+	"authHost": "https://nemoonehshow.ir",
 	"authEndpoint": "/broadcasting/auth",
 	"clients": [
 		{
@@ -22,11 +22,11 @@
     },
 	"host": null,
 	"port": "6001",
-	"protocol": "http",
+	"protocol": "https",
 	"socketio": {},
 	"secureOptions": 67108864,
-	"sslCertPath": "",
-	"sslKeyPath": "",
+	"sslCertPath": "/etc/letsencrypt/live/nemoonehshow.ir/fullchain.pem",
+	"sslKeyPath": "/etc/letsencrypt/live/nemoonehshow.ir/privkey.pem",
 	"sslCertChainPath": "",
 	"sslPassphrase": "",
 	"subscribers": {
