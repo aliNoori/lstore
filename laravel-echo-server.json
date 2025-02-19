@@ -20,10 +20,12 @@
         "enabled": true,
         "engine": "socket.io"
     },
-	"host": null,
+	"host": "nemoonehshow.ir",
 	"port": "6001",
 	"protocol": "https",
-	"socketio": {},
+    "socketio": {
+        "path": "/laravel-echo-server"
+    },
 	"secureOptions": 67108864,
 	"sslCertPath": "/etc/letsencrypt/live/nemoonehshow.ir/fullchain.pem",
 	"sslKeyPath": "/etc/letsencrypt/live/nemoonehshow.ir/privkey.pem",
