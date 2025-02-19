@@ -23,22 +23,20 @@
 	"host": "nemoonehshow.ir",
 	"port": "6001",
 	"protocol": "https",
-    "socketio": {
-        "path": "/laravel-echo-server"
-    },
+	"socketio": {},
 	"secureOptions": 67108864,
 	"sslCertPath": "/etc/letsencrypt/live/nemoonehshow.ir/fullchain.pem",
 	"sslKeyPath": "/etc/letsencrypt/live/nemoonehshow.ir/privkey.pem",
-	"sslCertChainPath": "",
+	"sslCertChainPath": "/etc/letsencrypt/live/nemoonehshow.ir/chain.pem",
 	"sslPassphrase": "",
 	"subscribers": {
 		"http": true,
 		"redis": true
 	},
 	"apiOriginAllow": {
-		"allowCors": false,
-		"allowOrigin": "",
-		"allowMethods": "",
-		"allowHeaders": ""
-	}
+        "allowCors": true,
+        "allowOrigin": "https://nemoonehshow.ir",
+        "allowMethods": "GET, POST",
+        "allowHeaders": "Origin, Content-Type, X-Auth-Token, Authorization, Accept, X-Requested-With"
+    }
 }
