@@ -27,16 +27,16 @@
 	"secureOptions": 67108864,
 	"sslCertPath": "/etc/letsencrypt/live/nemoonehshow.ir/fullchain.pem",
 	"sslKeyPath": "/etc/letsencrypt/live/nemoonehshow.ir/privkey.pem",
-	"sslCertChainPath": "/etc/letsencrypt/live/nemoonehshow.ir/chain.pem",
+	"sslCertChainPath": "",
 	"sslPassphrase": "",
 	"subscribers": {
 		"http": true,
 		"redis": true
 	},
 	"apiOriginAllow": {
-        "allowCors": true,
-        "allowOrigin": "https://nemoonehshow.ir",
-        "allowMethods": "GET, POST",
-        "allowHeaders": "Origin, Content-Type, X-Auth-Token, Authorization, Accept, X-Requested-With"
-    }
+		"allowCors": false,
+		"allowOrigin": "",
+		"allowMethods": "",
+		"allowHeaders": ""
+	}
 }
