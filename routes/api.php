@@ -64,8 +64,6 @@ Route::post('/callback/payment',[PaymentController::class,'callbackPayment']);
 
 ///////================   Product  =============///////////
 use \App\Http\Controllers\ProductController;
-
-
 Route::group(['prefix' => 'product'], function () {
 
     Route::get('/show/{id}', [ProductController::class, 'show']);
