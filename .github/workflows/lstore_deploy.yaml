@@ -34,8 +34,8 @@ jobs:
 
       - name: Enable site
         run: |
-           sudo a2dissite store.python.local.conf
-           sudo a2ensite store.laravel.local.conf
+           sudo a2dissite nemoonehshow.ir.conf
+           sudo a2ensite nemoonehshow.ir.conf
            sudo systemctl restart apache2
       - name: Check application health
         run: curl -f http://185.204.197.237/health-check
