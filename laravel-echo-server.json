@@ -1,12 +1,7 @@
 {
 	"authHost": "https://nemoonehshow.ir",
 	"authEndpoint": "/broadcasting/auth",
-	"clients": [
-		{
-			"appId": "963c9466e5e96e6f",
-			"key": "4571675e392b748f312b0614e84c9024"
-		}
-	],
+	"clients": [],
 	"database": "redis",
 	"databaseConfig": {
 		"redis": {},
@@ -15,12 +10,7 @@
 		}
 	},
 	"devMode": true,
-    "log_level": 3,
-    "debug": {
-        "enabled": true,
-        "engine": "socket.io"
-    },
-	"host": "nemoonehshow.ir",
+	"host": null,
 	"port": "6001",
 	"protocol": "https",
 	"socketio": {},
