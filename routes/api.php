@@ -49,6 +49,7 @@ Route::group(['prefix' => 'user'], function () {
         Route::post('/update/{id}', [UserController::class, 'update']);
         Route::delete('/delete/{id}', [UserController::class, 'delete']);
         /////address
+        Route::put('/show/address/{address_id}', [UserController::class, 'addressShow']);
         Route::get('/addresses', [UserController::class, 'addresses']);
         Route::post('/add/address', [UserController::class, 'addAddress']);
         Route::put('/edit/address/{id}', [UserController::class, 'editAddress']);
