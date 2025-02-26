@@ -3,21 +3,24 @@
 namespace App\Services\Payment\Gateways;
 
 use App\Services\Payment\PaymentGatewayInterface;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use SoapClient;
 use Exception;
 
 class ParsianGateway implements PaymentGatewayInterface
 {
-    private $terminalId;
-    private $wsdl;
-    private $paymentGateway;
+    private string $terminalId;
+    private string $wsdl;
+    private string $confirm_service_client;
+    private string $paymentGateway;
 
     public function __construct()
     {
         $this->terminalId = 'XGZ7hN6IcDieZ3bwXFAX';
         $this->wsdl = 'https://sandbox.banktest.ir/parsian/pec.shaparak.ir/NewIPGServices/Sale/SaleService.asmx?wsdl';
         $this->paymentGateway = 'https://sandbox.banktest.ir/parsian/pec.shaparak.ir/NewIPG';
+        $this->confirm_service_client='https://sandbox.banktest.ir/parsian/pec.shaparak.ir/NewIPGServices/Confirm/ConfirmService.asmx?wsdl';
     }
 
     public function processPayment($amount, $orderId, $callbackUrl): ?string
@@ -38,8 +41,8 @@ class ParsianGateway implements PaymentGatewayInterface
 
 
             if ($result->SalePaymentRequestResult->Status == 0) {  // بررسی موفقیت درخواست
-                $token = $result->SalePaymentRequestResult->Token;
-                $url = "{$this->paymentGateway}/?Token={$token}";
+                $this->token = $result->SalePaymentRequestResult->Token;
+                $url = "{$this->paymentGateway}/?Token={$this->token}";
                 return $url;
             } else {
                 throw new Exception("Error Processing Payment: " . $result->SalePaymentRequestResult->Status);
@@ -49,6 +52,38 @@ class ParsianGateway implements PaymentGatewayInterface
             return null;
         }
     }
+    public function confirm($token): JsonResponse
+    {
+        try {
+            $params = [
+                'LoginAccount' => $this->terminalId,
+                'Token' => $token,
+            ];
+            $client = new SoapClient($this->confirm_service_client, ['trace' => true, 'cache_wsdl' => WSDL_CACHE_NONE]);
+            $result = $client->ConfirmPayment(['requestData' => $params]);
+
+            if ($result->SalePaymentRequestResult->Status == 0) {  // بررسی موفقیت درخواست
+                $RRN = $result->SalePaymentRequestResult->RRN;
+                $CardNumberMasked = $result->SalePaymentRequestResult->CardNumberMasked;
+                $Token = $result->SalePaymentRequestResult->Token;
+                return response()->json([
+                    'success' => true,
+                    'RRN' => $RRN,
+                    'CardNumberMasked' => $CardNumberMasked,
+                    'Token' => $Token,
+                ], 200);
+            } else {
+                throw new Exception("Error Processing Payment: " . $result->SalePaymentRequestResult->Status);
+            }
+        } catch (Exception $e) {
+            Log::error("Parsian Gateway Error: {$e->getMessage()}");
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
 
     public function refund($transactionId)
     {
