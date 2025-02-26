@@ -62,10 +62,10 @@ class ParsianGateway implements PaymentGatewayInterface
             $client = new SoapClient($this->confirm_service_client, ['trace' => true, 'cache_wsdl' => WSDL_CACHE_NONE]);
             $result = $client->ConfirmPayment(['requestData' => $params]);
 
-            if ($result->SalePaymentRequestResult->Status == 0) {  // بررسی موفقیت درخواست
-                $RRN = $result->SalePaymentRequestResult->RRN;
-                $CardNumberMasked = $result->SalePaymentRequestResult->CardNumberMasked;
-                $Token = $result->SalePaymentRequestResult->Token;
+            if ($result->ConfirmPaymentResult->Status == 0) {  // بررسی موفقیت درخواست
+                $RRN = $result->ConfirmPaymentResult->RRN;
+                $CardNumberMasked = $result->ConfirmPaymentResult->CardNumberMasked;
+                $Token = $result->ConfirmPaymentResult->Token;
                 return response()->json([
                     'success' => true,
                     'RRN' => $RRN,
@@ -73,7 +73,7 @@ class ParsianGateway implements PaymentGatewayInterface
                     'Token' => $Token,
                 ], 200);
             } else {
-                throw new Exception("Error Processing Payment: " . $result->SalePaymentRequestResult->Status);
+                throw new Exception("Error Processing Payment: " . $result->ConfirmPaymentResult->Status);
             }
         } catch (Exception $e) {
             Log::error("Parsian Gateway Error: {$e->getMessage()}");
