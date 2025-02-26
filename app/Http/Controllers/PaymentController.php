@@ -75,6 +75,7 @@ class PaymentController extends Controller
 
             $payment = PaymentGateway::make('parsian');
             $result=$payment->confirm($request->Token);
+            Log::info('$result',[$result]);
             if($result->success=='true'){
                 // نوع تراکنش و روش پرداخت
                 $transaction_type = 'buy';
