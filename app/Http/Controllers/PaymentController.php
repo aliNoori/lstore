@@ -75,8 +75,13 @@ class PaymentController extends Controller
 
             $payment = PaymentGateway::make('parsian');
             $result=$payment->confirm($request->Token);
-            Log::info('$result',[$result]);
-            if($result->success=='true'){
+            // دریافت محتوای JSON و تبدیل آن به آرایه
+            $resultData = $result->getData(true);
+
+            if ($resultData['success'] === true) {
+                $RRN = $resultData['RRN'];
+                $CardNumberMasked = $resultData['CardNumberMasked'];
+                $Token = $resultData['Token'];
                 // نوع تراکنش و روش پرداخت
                 $transaction_type = 'buy';
                 $payment_method = 'online';
@@ -90,7 +95,7 @@ class PaymentController extends Controller
                     'status' => $request->status,
                     'token' => $request->Token,
                     'card_number_hash' => $request->HashCardNumber,
-                    'rrn' => $result->RRN,
+                    'rrn' => $RRN,
                     'terminal_no' => $request->TerminalNo,
                     'tsp_token' => $request->TspToken,
                     'sw_amount' => floatval(str_replace(',', '', $request->SwAmount)),
@@ -113,6 +118,7 @@ class PaymentController extends Controller
                     'amount' => $transaction->amount,
                     'status' => $transaction->status,
                     'token' => $transaction->token,
+                    'rrn'=>$transaction->rrn,
                 ];
             }
 
