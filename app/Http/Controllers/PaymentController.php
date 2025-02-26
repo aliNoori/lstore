@@ -28,7 +28,8 @@ class PaymentController extends Controller
      * آدرس بازگشت (Callback URL) برای سیستم پرداخت
      */
     //private string $CALL_BACK_URL = 'http://192.168.1.105/api/callback/payment';
-    private string $CALL_BACK_URL = 'http://185.204.197.237/store/api/callback/payment';
+    //private string $CALL_BACK_URL = 'http://185.204.197.237/store/api/callback/payment';
+    private string $CALL_BACK_URL = 'https://nemoonehshow.ir/store/api/callback/payment';
     /**
      * پردازش درخواست پرداخت
      *
