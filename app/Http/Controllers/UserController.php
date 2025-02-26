@@ -163,6 +163,26 @@ class UserController extends Controller
             'addresses' => AddressResource::collection($addresses),
         ], 200);
     }
+    public function addressShow(Request $request, $address_id): JsonResponse
+    {
+        $user = $request->user();
+
+        // دریافت آدرس خاص بر اساس آدرس آیدی
+        $address = $user->addresses()->where('id', $address_id)->first();
+
+        if (!$address) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Address not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'address' => new AddressResource($address),
+        ], 200);
+    }
+
 
     public function myWallet(Request $request): JsonResponse
     {
