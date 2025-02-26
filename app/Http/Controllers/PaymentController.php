@@ -71,46 +71,50 @@ class PaymentController extends Controller
     {
         // بررسی وضعیت پاسخ بازگشت و وجود خطا
         $error_message = $request->CallbackError ?? null;
-
         if ($request->status == 0) { // تراکنش موفق
 
-            // نوع تراکنش و روش پرداخت
-            $transaction_type = 'buy';
-            $payment_method = 'online';
+            $payment = PaymentGateway::make('parsian');
+            $result=$payment->confirm($request->Token);
+            if($result->success=='true'){
+                // نوع تراکنش و روش پرداخت
+                $transaction_type = 'buy';
+                $payment_method = 'online';
 
-            // ثبت تراکنش در پایگاه داده
-            $transaction = Transaction::create([
-                'order_id' => $request->OrderId,
-                'transaction_type' => $transaction_type,
-                'payment_method' => $payment_method,
-                'amount' => floatval(str_replace(',', '', $request->Amount)),
-                'status' => $request->status,
-                'token' => $request->Token,
-                'card_number_hash' => $request->HashCardNumber,
-                'rrn' => $request->RRn,
-                'terminal_no' => $request->TerminalNo,
-                'tsp_token' => $request->TspToken,
-                'sw_amount' => floatval(str_replace(',', '', $request->SwAmount)),
-                'strace_no' => $request->STraceNo,
-                'redirect_url' => $request->RedirectURL,
-                'callback_error' => $request->CallbackError,
-                'verify_error' => $request->VerifyError,
-                'reverse_error' => $request->ReverseError,
-            ]);
+                // ثبت تراکنش در پایگاه داده
+                $transaction = Transaction::create([
+                    'order_id' => $request->OrderId,
+                    'transaction_type' => $transaction_type,
+                    'payment_method' => $payment_method,
+                    'amount' => floatval(str_replace(',', '', $request->Amount)),
+                    'status' => $request->status,
+                    'token' => $request->Token,
+                    'card_number_hash' => $request->HashCardNumber,
+                    'rrn' => $result->RRN,
+                    'terminal_no' => $request->TerminalNo,
+                    'tsp_token' => $request->TspToken,
+                    'sw_amount' => floatval(str_replace(',', '', $request->SwAmount)),
+                    'strace_no' => $request->STraceNo,
+                    'redirect_url' => $request->RedirectURL,
+                    'callback_error' => $request->CallbackError,
+                    'verify_error' => $request->VerifyError,
+                    'reverse_error' => $request->ReverseError,
+                ]);
 
-            // یافتن سفارش مرتبط
-            $order = Order::findOrFail($request->OrderId);
+                // یافتن سفارش مرتبط
+                $order = Order::findOrFail($request->OrderId);
 
-            // اجرای وظایف (Jobs) مرتبط با پاداش‌ها و اطلاع‌رسانی‌ها
-            $this->handleRewardsAndNotifications($order, $request);
+                // اجرای وظایف (Jobs) مرتبط با پاداش‌ها و اطلاع‌رسانی‌ها
+                $this->handleRewardsAndNotifications($order, $request);
 
-            // آماده‌سازی داده‌های تراکنش
-            $transaction_data = [
-                'order_id' => $transaction->order_id,
-                'amount' => $transaction->amount,
-                'status' => $transaction->status,
-                'token' => $transaction->token,
-            ];
+                // آماده‌سازی داده‌های تراکنش
+                $transaction_data = [
+                    'order_id' => $transaction->order_id,
+                    'amount' => $transaction->amount,
+                    'status' => $transaction->status,
+                    'token' => $transaction->token,
+                ];
+            }
+
         }
 
         // کاربر مرتبط با سفارش
