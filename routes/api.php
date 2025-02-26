@@ -52,7 +52,7 @@ Route::group(['prefix' => 'user'], function () {
         Route::get('/show/address/{address_id}', [UserController::class, 'addressShow']);
         Route::get('/addresses', [UserController::class, 'addresses']);
         Route::post('/add/address', [UserController::class, 'addAddress']);
-        Route::put('/edit/address/{id}', [UserController::class, 'editAddress']);
+        Route::post('/edit/address/{id}', [UserController::class, 'editAddress']);
 
         ///gateway
         Route::post('/manageSelectedPayment/{id}',[PaymentGatewayController::class,'manageGateway']);
