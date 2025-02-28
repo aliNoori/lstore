@@ -30,6 +30,7 @@ class PaymentController extends Controller
     //private string $CALL_BACK_URL = 'http://192.168.1.105/api/callback/payment';
     //private string $CALL_BACK_URL = 'http://185.204.197.237/store/api/callback/payment';
     private string $CALL_BACK_URL = 'https://nemoonehshow.ir/store/api/callback/payment';
+
     /**
      * پردازش درخواست پرداخت
      *
@@ -61,6 +62,7 @@ class PaymentController extends Controller
         // بازگشت لینک پرداخت به فرمت JSON
         return response()->json(['url' => $url], 200, [], JSON_UNESCAPED_SLASHES);
     }
+
     /**
      * پردازش پاسخ بازگشت از درگاه پرداخت
      *
@@ -74,7 +76,7 @@ class PaymentController extends Controller
         if ($request->status == 0) { // تراکنش موفق
 
             $payment = PaymentGateway::make('parsian');
-            $result=$payment->confirm($request->Token);
+            $result = $payment->confirm($request->Token);
             // دریافت محتوای JSON و تبدیل آن به آرایه
             $resultData = $result->getData(true);
 
@@ -118,12 +120,36 @@ class PaymentController extends Controller
                     'amount' => $transaction->amount,
                     'status' => $transaction->status,
                     'token' => $transaction->token,
-                    'rrn'=>$transaction->rrn,
+                    'rrn' => $transaction->rrn,
+                    'card_number_masked'=>$CardNumberMasked,
                 ];
-            }
+            }/*elseif ($request->status == -1) {
+                $error_message = "خطای سرور";
+            } elseif ($request->status == -130) {
+                $error_message = "زمان توکن منقضی شده است";
+            } elseif ($request->status == -131) {
+                $error_message = "توکن نامعتبر است";
+            } elseif ($request->status == -138) {
+                $error_message = "توسط کاربر لغو شد";
+            } elseif ($request->status == -32768) {
+                $error_message = "خطای ناشناخته رخ داده است";
+            } elseif ($request->status == -1528) {
+                $error_message = "اطلاعات پرداخت یافت نشد";
+            }*/
 
+        } elseif ($request->status == -1) {
+            $error_message = "خطای سرور";
+        } elseif ($request->status == -130) {
+            $error_message = "زمان توکن منقضی شده است";
+        } elseif ($request->status == -131) {
+            $error_message = "توکن نامعتبر است";
+        } elseif ($request->status == -138) {
+            $error_message = "توسط کاربر لغو شد";
+        } elseif ($request->status == -32768) {
+            $error_message = "خطای ناشناخته رخ داده است";
+        } elseif ($request->status == -1528) {
+            $error_message = "اطلاعات پرداخت یافت نشد";
         }
-
         // کاربر مرتبط با سفارش
         $user = $order->user;
 
@@ -140,7 +166,8 @@ class PaymentController extends Controller
 
         return Redirect::to($redirect_url);
     }
-    public function paymentWithWallet($order_number,$wallet_id)
+
+    public function paymentWithWallet($order_number, $wallet_id)
     {
         // یافتن سفارش مرتبط با شماره سفارش
         $order = Order::where('order_number', $order_number)->firstOrFail();
@@ -164,12 +191,12 @@ class PaymentController extends Controller
             // ایجاد یک تراکنش جدید در کیف پول
             $transaction = new Transaction();
             $transaction->wallet_id = $wallet->id;
-            $transaction->order_id=$order->id;
+            $transaction->order_id = $order->id;
             $transaction->amount = $amount;
             $transaction->transaction_type = 'payment'; // نوع تراکنش (مثلاً بدهی)
             $transaction->status = 'complete';
             $transaction->payment_method = 'wallet';
-            $transaction->sw_amount=$amount;
+            $transaction->sw_amount = $amount;
             $transaction->save();
 
             // کم کردن مبلغ از موجودی کیف پول
@@ -181,12 +208,12 @@ class PaymentController extends Controller
             // تایید تراکنش
             DB::commit();
             return response()->json([
-                'transaction'=>new TransactionResource($transaction),200]);
+                'transaction' => new TransactionResource($transaction), 200]);
         } catch (Exception $e) {
             // لغو تراکنش در صورت بروز خطا
             DB::rollBack();
             return response()->json([
-                'error'=>$e->getMessage(),401
+                'error' => $e->getMessage(), 401
             ]);
         }
     }
