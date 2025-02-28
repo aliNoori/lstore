@@ -24,9 +24,9 @@
 		"redis": true
 	},
 	"apiOriginAllow": {
-		"allowCors": false,
-		"allowOrigin": "",
-		"allowMethods": "",
-		"allowHeaders": ""
-	}
+        "allowCors": true,
+        "allowOrigin": "https://nemoonehshow.ir",
+        "allowMethods": "GET, POST, PUT, DELETE, OPTIONS",
+        "allowHeaders": "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    }
 }
