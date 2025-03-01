@@ -1,5 +1,5 @@
 {
-	"authHost": "https://nemoonehshow.ir",
+	"authHost": "http://185.204.197.137",
 	"authEndpoint": "/broadcasting/auth",
 	"clients": [],
 	"database": "redis",
@@ -12,7 +12,7 @@
 	"devMode": true,
 	"host": null,
 	"port": "6001",
-	"protocol": "https",
+	"protocol": "http",
 	"socketio": {},
 	"secureOptions": 67108864,
 	"sslCertPath": "/etc/letsencrypt/live/nemoonehshow.ir/fullchain.pem",
