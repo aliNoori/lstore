@@ -43,6 +43,7 @@ class ParsianGateway implements PaymentGatewayInterface
             if ($result->SalePaymentRequestResult->Status == 0) {  // بررسی موفقیت درخواست
                 $this->token = $result->SalePaymentRequestResult->Token;
                 $url = "{$this->paymentGateway}/?Token={$this->token}";
+                Log::info('$url',[$url]);
                 return $url;
             } else {
                 throw new Exception("Error Processing Payment: " . $result->SalePaymentRequestResult->Status);
