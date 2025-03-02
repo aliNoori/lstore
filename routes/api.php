@@ -186,6 +186,8 @@ use App\Http\Controllers\OrderController;
 
 Route::group(['prefix' => 'user'], function () {
 
+    Route::get('/orders', [OrderController::class, 'showOrders']);
+
     Route::middleware(['auth:sanctum'/*, 'has.permission', 'has.role'*/])->group(function () {
 
         // نمایش لیست سفارش‌های کاربر (سفارش‌های فعلی کاربر لاگین‌شده)

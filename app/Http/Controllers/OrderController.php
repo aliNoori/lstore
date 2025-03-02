@@ -113,6 +113,23 @@ class OrderController extends Controller
             'order' => new OrderResource($order),
         ]);
     }
+    public function showOrders(Request $request): JsonResponse
+    {
+        $orders = Order::with('orderDetails.product.image')->get();
+
+        if ($orders->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'هیچ سفارشی یافت نشد',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'orders' => OrderResource::collection($orders),
+        ]);
+    }
+
 
     // به‌روزرسانی وضعیت سفارش
     public function updateOrderStatus(Request $request, $id): JsonResponse
