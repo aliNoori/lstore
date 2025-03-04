@@ -137,7 +137,7 @@ class PaymentController extends Controller
                 $error_message = "اطلاعات پرداخت یافت نشد";
             }*/
 
-        } elseif ($request->status == -1) {
+        } /*elseif ($request->status == -1) {
             $error_message = "خطای سرور";
         } elseif ($request->status == -130) {
             $error_message = "زمان توکن منقضی شده است";
@@ -149,7 +149,7 @@ class PaymentController extends Controller
             $error_message = "خطای ناشناخته رخ داده است";
         } elseif ($request->status == -1528) {
             $error_message = "اطلاعات پرداخت یافت نشد";
-        }
+        }*/
         // کاربر مرتبط با سفارش
         $user = $order->user;
 

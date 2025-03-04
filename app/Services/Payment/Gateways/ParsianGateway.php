@@ -36,7 +36,14 @@ class ParsianGateway implements PaymentGatewayInterface
 
         try {
             // ایجاد کلاینت Soap و درخواست
-            $client = new SoapClient($this->wsdl, ['trace' => true, 'cache_wsdl' => WSDL_CACHE_NONE]);
+            $client = new SoapClient($this->wsdl, [
+                'stream_context' => stream_context_create([
+                    'socket' => ['bindto' => '0.0.0.0:0'] // ����� �� ������� �� IPv4
+                ]),
+                'trace'        => true,
+                'cache_wsdl'   => WSDL_CACHE_NONE,
+                'exceptions'   => true, // Ensures exceptions are thrown
+            ]);
 
             $result = $client->SalePaymentRequest(['requestData' => $params]);
 
@@ -61,7 +68,9 @@ class ParsianGateway implements PaymentGatewayInterface
                 'LoginAccount' => $this->terminalId,
                 'Token' => $token,
             ];
-            $client = new SoapClient($this->confirm_service_client, ['trace' => true, 'cache_wsdl' => WSDL_CACHE_NONE]);
+            $client = new SoapClient($this->confirm_service_client, ['stream_context' => stream_context_create([
+                'socket' => ['bindto' => '0.0.0.0:0'] // ����� �� ������� �� IPv4
+            ]),'trace' => true, 'cache_wsdl' => WSDL_CACHE_NONE]);
             $result = $client->ConfirmPayment(['requestData' => $params]);
 
             if ($result->ConfirmPaymentResult->Status == 0) {  // بررسی موفقیت درخواست
