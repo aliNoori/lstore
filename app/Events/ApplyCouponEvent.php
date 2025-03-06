@@ -21,6 +21,11 @@ class ApplyCouponEvent implements ShouldBroadcast
     {
         $this->user = $user;
         $this->message=$message;
+        $this->user->notifications()->create([
+            'user_id' => $this->user->id,
+            'message' => $this->message,
+            'is_read' => false,
+        ]);
     }
 
     public function broadcastOn(): Channel|PrivateChannel

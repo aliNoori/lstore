@@ -10,12 +10,14 @@ use App\Http\Resources\AddressResource;
 use App\Http\Resources\CouponResource;
 use App\Http\Resources\OrderResource;
 use App\Http\Resources\ScoreResource;
+use App\Http\Resources\UserNotificationResource;
 use App\Http\Resources\UserResource;
 use App\Http\Resources\WalletResource;
 use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -31,6 +33,37 @@ class UserController extends Controller
         $user = $request->user();
         $this->authorize('view', $user);
         return new UserResource($user);
+    }
+    public function userNotifications(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $notifications = $user->notifications()->where('is_read', false)->get();
+
+        return response()->json([
+            'success' => true,
+            'notifications' => UserNotificationResource::collection($notifications),
+        ], 200);
+    }
+
+    public function userNotificationChangeStatus(Request $request, $id): JsonResponse
+    {
+        $user = $request->user();
+        // پیدا کردن اعلان با استفاده از شناسه
+        $notification = $user->notifications()->find($id);
+
+        if (!$notification) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Notification not found',
+            ], 404);
+        }
+
+        // به روز رسانی وضعیت خوانده شده
+        $notification->update(['is_read' => true]);
+
+        return response()->json([
+            'success' => true,
+        ], 200);
     }
 
     public function usersList(): JsonResponse
@@ -213,7 +246,12 @@ class UserController extends Controller
     private function getUserResource(Request $request, $relation, $resourceClass): JsonResponse
     {
         $user = $request->user();
-        $data = $user->$relation()->get();
+        $query = $user->$relation()->get();
+
+        // مرتب‌سازی بر اساس جدیدترین
+        $query->orderBy('created_at', 'desc');
+
+        $data = $query->get();
 
         return response()->json([
             'success' => true,

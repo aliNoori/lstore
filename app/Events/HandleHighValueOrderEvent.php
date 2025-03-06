@@ -21,6 +21,11 @@ class HandleHighValueOrderEvent implements ShouldBroadcast
     {
         $this->order = $order;
         $this->message=$message;
+        $this->order->user->notifications()->create([
+            'user_id' => $this->order->user->id,
+            'message' => $this->message,
+            'is_read' => false,
+        ]);
     }
 
     public function broadcastOn(): Channel|PrivateChannel

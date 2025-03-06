@@ -34,6 +34,8 @@ Route::group(['prefix' => 'user'], function () {
     Route::middleware(['auth:sanctum'/*, 'has.permission', 'has.role'*/])->group(function () {
         Route::get('/logout', [AuthController::class, 'logout']);
         Route::get('/profile', [UserController::class, 'profile']);
+        Route::get('/notifications', [UserController::class, 'userNotifications']);
+        Route::get('/notification/{id}/changeStatus', [UserController::class, 'userNotificationChangeStatus']);
         /////////
         Route::group(['prefix' => 'my'], function () {
 

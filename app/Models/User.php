@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Traits\ImageManager;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -63,21 +64,24 @@ class User extends Authenticatable
     {
         return $this->hasOne(Wallet::class);
     }
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class);
+    }
 
-
-    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
-    public function scores(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function scores(): HasMany
     {
         return $this->hasMany(Score::class);
     }
-    public function coupons(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function coupons(): HasMany
     {
         return $this->hasMany(Coupon::class);
     }
-    public function addresses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function addresses(): HasMany
     {
         return $this->hasMany(Address::class);
     }
