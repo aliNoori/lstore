@@ -1,0 +1,37 @@
+{
+    "authHost": "https://nemoonehshow.ir",
+    "authEndpoint": "/broadcasting/auth",
+    "clients": [
+        {
+            "appId": "24472a8bd6cb6441",
+            "key": "22c94e01c7ea87e8981adbf55c6c30b6"
+        }
+    ],
+    "database": "redis",
+    "databaseConfig": {
+        "redis": {},
+        "sqlite": {
+            "databasePath": "/database/laravel-echo-server.sqlite"
+        }
+    },
+    "devMode": true,
+    "host": "nemoonehshow.ir",
+    "port": "6001",
+    "protocol": "https",
+    "socketio": {},
+    "secureOptions": 67108864,
+    "sslCertPath": "/etc/letsencrypt/live/nemoonehshow.ir/fullchain.pem",
+    "sslKeyPath": "/etc/letsencrypt/live/nemoonehshow.ir/privkey.pem",
+    "sslCertChainPath": "/etc/letsencrypt/live/nemoonehshow.ir/chain.pem",
+    "sslPassphrase": "",
+    "subscribers": {
+        "http": true,
+        "redis": true
+    },
+    "apiOriginAllow": {
+        "allowCors": false,
+        "allowOrigin": "",
+        "allowMethods": "",
+        "allowHeaders": ""
+    }
+}
