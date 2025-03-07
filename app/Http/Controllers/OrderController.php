@@ -16,17 +16,18 @@ class OrderController extends Controller
     {
         $user = $request->user();
 
-        $query = $user->orders()->with('orderDetails.product.image')->get();
-        // مرتب‌سازی بر اساس وضعیت و سپس جدیدترین سفارش‌ها
-        $query->orderByRaw("FIELD(status,'completed', 'pending', 'cancelled'), created_at DESC");
+        $query = $user->orders()
+            ->with('orderDetails.product.image')
+            ->orderByRaw("FIELD(status,'completed', 'pending', 'cancelled'), created_at DESC"); // مرتب‌سازی بر اساس وضعیت و سپس جدیدترین سفارش‌ها
 
-        $orders = $query->get();
+        $orders = $query->get(); // بازیابی اطلاعات
 
         return response()->json([
             'success' => true,
             'orders' => $orders,
         ]);
     }
+
 
     // ایجاد سفارش جدید
     public function createOrder(Request $request, $addressId): JsonResponse

@@ -246,16 +246,14 @@ class UserController extends Controller
     private function getUserResource(Request $request, $relation, $resourceClass): JsonResponse
     {
         $user = $request->user();
-        $query = $user->$relation()->get();
+        $query = $user->$relation()->orderBy('created_at', 'desc'); // مرتب‌سازی بر اساس جدیدترین
 
-        // مرتب‌سازی بر اساس جدیدترین
-        $query->orderBy('created_at', 'desc');
-
-        $data = $query->get();
+        $data = $query->get(); // بازیابی اطلاعات
 
         return response()->json([
             'success' => true,
             $relation => $resourceClass::collection($data),
         ], 200);
     }
+
 }
