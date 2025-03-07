@@ -41,9 +41,15 @@ class PasswordResetController extends Controller
         if (!$email || !$token) {
             return response()->json(['error' => 'ایمیل یا توکن نامعتبر است.'], 400);
         }
+// ایجاد پارامترهای کوئری
+        $query_params = [
+            'email' => $email,
+            'token' => $token
+        ];
 
         // ایجاد URL برای ریدایرکت به فرانت‌اند
-        $redirect_url = "https://nemoonehshow.ir/reset-password/$token?email=$email";
+        $url = 'https://nemoonehshow.ir/reset-password';
+        $redirect_url = $url . '?' . http_build_query($query_params);
 
         // ریدایرکت به فرانت‌اند
         return Redirect::to($redirect_url);
