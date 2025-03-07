@@ -31,7 +31,7 @@ class PasswordResetController extends Controller
             return response()->json(['error' => 'Unable to send reset link.'], 400);
         }
     }
-    public function RedirectShowResetPasswordForm(Request $request, $token): Application|RedirectResponse|Redirector|JsonResponse
+    public function RedirectShowResetPasswordForm(Request $request, $token): RedirectResponse|JsonResponse
     {
         // دریافت ایمیل از کوئری استرینگ
         $email = $request->query('email');
@@ -41,7 +41,7 @@ class PasswordResetController extends Controller
         if (!$email || !$token) {
             return response()->json(['error' => 'ایمیل یا توکن نامعتبر است.'], 400);
         }
-// ایجاد پارامترهای کوئری
+
         $query_params = [
             'email' => $email,
             'token' => $token
