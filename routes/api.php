@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\PaymentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -25,6 +26,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 ####test Socket###
 Route::post('/socket',[UserController::class, 'testSocket']);
+############################## forgot password ############
+Route::post('/password/email', [PasswordResetController::class, 'forgotPassword'])
+    ->middleware('guest');
+
+Route::post('/password/reset', [PasswordResetController::class, 'reset'])
+    ->middleware('guest');
 ####
 Route::group(['prefix' => 'user'], function () {
     // Other routes without middleware
