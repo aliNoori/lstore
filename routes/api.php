@@ -29,7 +29,6 @@ Route::post('/socket',[UserController::class, 'testSocket']);
 ############################## forgot password ############
 Route::post('/password/email', [PasswordResetController::class, 'forgotPassword'])
     ->middleware('guest');
-
 Route::post('/password/reset', [PasswordResetController::class, 'reset'])
     ->middleware('guest');
 ####

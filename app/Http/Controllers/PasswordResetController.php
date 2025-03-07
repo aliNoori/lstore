@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -11,19 +12,23 @@ use Illuminate\Support\Str;
 
 class PasswordResetController extends Controller
 {
-    public  function forgotPassword(Request $request): RedirectResponse
+    public function forgotPassword(Request $request): JsonResponse
     {
-
         $request->validate(['email' => 'required|email']);
 
         $status = Password::sendResetLink(
             $request->only('email')
         );
 
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with(['status' => __($status)])
-            : back()->withErrors(['email' => __($status)]);
+        if ($status === Password::RESET_LINK_SENT) {
+            return response()->json(['message' => __($status)], 200);
+        } else if ($status === Password::INVALID_USER) {
+            return response()->json(['error' => 'Invalid user.'], 400);
+        } else {
+            return response()->json(['error' => 'Unable to send reset link.'], 400);
+        }
     }
+
     public function reset(Request $request): RedirectResponse
     {
         $request->validate([

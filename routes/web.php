@@ -31,6 +31,9 @@ Route::get('/health-check', function () {
         return response()->json(['status' => 'Error', 'message' => $e->getMessage()], 500);
     }
 });
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetPasswordForm'])
+    ->middleware('guest')
+    ->name('password.reset');
 ############ Verify Email ################
 Route::get('/email/verify',[EmailVerificationController::class,'show'])
     ->middleware('auth')
