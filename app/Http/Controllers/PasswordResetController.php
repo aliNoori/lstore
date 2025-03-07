@@ -56,14 +56,16 @@ class PasswordResetController extends Controller
     }
 
 
-    public function reset(Request $request): RedirectResponse
+    public function reset(Request $request): RedirectResponse|JsonResponse
     {
+        // اعتبارسنجی ورودی‌ها
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|min:8|confirmed',
         ]);
 
+        // بازنشانی رمز عبور
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
@@ -77,8 +79,20 @@ class PasswordResetController extends Controller
             }
         );
 
-        return $status === Password::PASSWORD_RESET
-            ? redirect()->route('login')->with('status', __($status))
-            : back()->withErrors(['email' => [__($status)]]);
+        // بررسی وضعیت بازنشانی رمز عبور و ریدایرکت به فرانت‌اند
+        if ($status === Password::PASSWORD_RESET) {
+            $url = 'https://nemoonehshow.ir/login';
+            $query_params = [
+                'status' => 'password-reset'
+            ];
+            $redirect_url = $url . '?' . http_build_query($query_params);
+
+            // ریدایرکت به فرانت‌اند
+            return Redirect::to($redirect_url);
+        } else if ($status === Password::INVALID_USER) {
+            return response()->json(['error' => 'Invalid user.'], 400);
+        } else {
+            return response()->json(['error' => 'Unable to reset password.'], 400);
+        }
     }
 }
