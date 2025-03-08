@@ -51,7 +51,7 @@ class UserRequest extends FormRequest
             //'password2' => $userId ? 'nullable|string|min:8|same:password' : 'required|string|min:8|same:password', // شرط برابری پسوردها
             //method 2
             'password' => $userId ? 'nullable|string|min:8|confirmed' : 'required|string|min:8|confirmed', // استفاده از confirmed
-            'image' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048', // برای اعتبارسنجی فایل تصویری
+            'image' => 'image|mimes:jpeg,png,jpg,gif,webp|max:6048', // برای اعتبارسنجی فایل تصویری
         ];
     }
 
