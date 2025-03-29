@@ -234,12 +234,25 @@ Route::group(['prefix' => 'permissionRoleSetting'], function () {
 
 Route::get('/generate-captcha', function () {
     $randomNumber = random_int(10000, 99999); // تولید عدد تصادفی
+    $imageWidth = 200;
+    $imageHeight = 70;
 
     // ایجاد تصویر با GD
-    $image = imagecreate(150, 50);
-    $backgroundColor = imagecolorallocate($image, 255, 255, 255); // رنگ سفید
-    $textColor = imagecolorallocate($image, 0, 0, 0); // رنگ مشکی
-    imagestring($image, 5, 40, 15, $randomNumber, $textColor);
+    $image = imagecreate($imageWidth, $imageHeight);
+
+    // تنظیم رنگ‌های پس‌زمینه و متن
+    $backgroundColor = imagecolorallocate($image, 255, 255, 255); // سفید
+    $textColor = imagecolorallocate($image, random_int(0, 150), random_int(0, 150), random_int(0, 150)); // رنگ تصادفی برای متن
+
+    // ایجاد نویز در پس‌زمینه
+    for ($i = 0; $i < 150; $i++) {
+        $dotColor = imagecolorallocate($image, random_int(200, 255), random_int(200, 255), random_int(200, 255));
+        imagesetpixel($image, random_int(0, $imageWidth), random_int(0, $imageHeight), $dotColor);
+    }
+
+    // افزودن متن به تصویر با انحنا و فونت سفارشی
+    $fontPath = 'path/to/font.ttf'; // مسیر فایل فونت
+    imagettftext($image, 20, random_int(-15, 15), 50, 45, $textColor, $fontPath, $randomNumber);
 
     // ذخیره تصویر به عنوان خروجی
     header('Content-Type: image/png');
@@ -248,8 +261,10 @@ Route::get('/generate-captcha', function () {
     $data = ob_get_clean();
     imagedestroy($image);
 
+    // ارسال داده‌های تصویر به فرانت
     return response()->json(['image' => base64_encode($data)]);
 });
+
 
 
 
