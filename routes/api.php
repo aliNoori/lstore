@@ -232,3 +232,20 @@ Route::group(['prefix' => 'permissionRoleSetting'], function () {
 });
 
 
+Route::get('/generate-captcha', function () {
+    $randomNumber = random_int(10000, 99999); // تولید عدد تصادفی
+
+    // ایجاد تصویر با GD
+    $image = imagecreate(150, 50);
+    $backgroundColor = imagecolorallocate($image, 255, 255, 255); // رنگ سفید
+    $textColor = imagecolorallocate($image, 0, 0, 0); // رنگ مشکی
+    imagestring($image, 5, 40, 15, $randomNumber, $textColor);
+
+    // ذخیره تصویر به عنوان خروجی
+    header('Content-Type: image/png');
+    imagepng($image);
+    imagedestroy($image);
+});
+
+
+
