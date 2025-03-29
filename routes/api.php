@@ -243,8 +243,12 @@ Route::get('/generate-captcha', function () {
 
     // ذخیره تصویر به عنوان خروجی
     header('Content-Type: image/png');
+    ob_start();
     imagepng($image);
+    $data = ob_get_clean();
     imagedestroy($image);
+
+    return response()->json(['image' => base64_encode($data)]);
 });
 
 
