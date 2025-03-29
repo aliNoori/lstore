@@ -251,7 +251,8 @@ Route::get('/generate-captcha', function () {
     }
 
     // افزودن متن به تصویر با انحنا و فونت سفارشی
-    $fontPath = 'path/to/font.ttf'; // مسیر فایل فونت
+    $fontPath = public_path('fonts/DejaVuSans.ttf');
+
     imagettftext($image, 20, random_int(-15, 15), 50, 45, $textColor, $fontPath, $randomNumber);
 
     // ذخیره تصویر به عنوان خروجی
